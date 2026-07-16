@@ -1,0 +1,6 @@
+{
+  "name": "Tan Ca Roi",
+  "description": "Một góc nhỏ thư giãn dành cho những người đã có một ngày hơi dài.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
