@@ -48,6 +48,8 @@ export const AudioPlayerMini: React.FC<AudioPlayerMiniProps> = ({
   const [volume, setVolume] = useState<number>(0.5);
   const [isMuted, setIsMuted] = useState<boolean>(false);
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
+  const [currentTime, setCurrentTime] = useState<number>(0);
+  const [duration, setDuration] = useState<number>(0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const currentTrack = tracks.find((t) => t.id === activeTrackId) || tracks[0];
@@ -59,11 +61,28 @@ export const AudioPlayerMini: React.FC<AudioPlayerMiniProps> = ({
       audioRef.current.loop = true;
     }
 
+    const audio = audioRef.current;
+
+    const handleTimeUpdate = () => {
+      setCurrentTime(audio.currentTime);
+    };
+
+    const handleDurationChange = () => {
+      setDuration(audio.duration || 0);
+    };
+
+    audio.addEventListener('timeupdate', handleTimeUpdate);
+    audio.addEventListener('durationchange', handleDurationChange);
+    audio.addEventListener('loadedmetadata', handleDurationChange);
+
     return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current = null;
+      if (audio) {
+        audio.pause();
+        audio.removeEventListener('timeupdate', handleTimeUpdate);
+        audio.removeEventListener('durationchange', handleDurationChange);
+        audio.removeEventListener('loadedmetadata', handleDurationChange);
       }
+      audioRef.current = null;
     };
   }, []);
 
@@ -81,6 +100,7 @@ export const AudioPlayerMini: React.FC<AudioPlayerMiniProps> = ({
       audioRef.current.src = currentTrack.url; 
       audioRef.current.load();
       audioRef.current.volume = isMuted ? 0 : volume;
+      setCurrentTime(0);
 
       if (wasPlaying) {
         audioRef.current.play().catch((err) => {
@@ -98,7 +118,6 @@ export const AudioPlayerMini: React.FC<AudioPlayerMiniProps> = ({
         audioRef.current.play().catch((err) => {
           console.warn('Audio play blocked: ', err);
           onPlayPauseToggle(false);
-          onToast('Hãy tương tác với trang để mở âm thanh chill nhé.', 'info');
         });
       } else {
         audioRef.current.pause();
@@ -116,9 +135,6 @@ export const AudioPlayerMini: React.FC<AudioPlayerMiniProps> = ({
   const handleTogglePlay = () => {
     const nextState = !isPlaying;
     onPlayPauseToggle(nextState);
-    if (nextState) {
-      onToast(`Đang phát: ${currentTrack.name}`, 'success');
-    }
   };
 
   const handleMuteToggle = () => {
@@ -127,10 +143,21 @@ export const AudioPlayerMini: React.FC<AudioPlayerMiniProps> = ({
 
   const handleTrackSelect = (id: string) => {
     onChangeTrack(id);
-    const selected = tracks.find((t) => t.id === id);
-    if (selected) {
-      onToast(`Đã chuyển sang: ${selected.name}`, 'success');
+  };
+
+  const handleProgressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newTime = parseFloat(e.target.value);
+    setCurrentTime(newTime);
+    if (audioRef.current) {
+      audioRef.current.currentTime = newTime;
     }
+  };
+
+  const formatTime = (secs: number) => {
+    if (isNaN(secs) || !isFinite(secs)) return '00:00';
+    const m = Math.floor(secs / 60);
+    const s = Math.floor(secs % 60);
+    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   };
 
   const renderIcon = (name: string, size = 18) => {
@@ -148,10 +175,10 @@ export const AudioPlayerMini: React.FC<AudioPlayerMiniProps> = ({
 
   return (
     <div 
-      className="fixed bottom-6 left-6 z-[9990] flex flex-col items-start gap-2"
+      className="fixed bottom-4 left-4 right-4 md:bottom-6 md:left-6 md:right-auto z-[99999] flex flex-col items-stretch md:items-start gap-2"
       id="cozy-ambient-audio-player"
     >
-      <div className="bg-cozy-ivory/95 hover:bg-cozy-ivory border border-cozy-wood/10 backdrop-blur-md rounded-2xl shadow-xl p-3 max-w-sm w-80 md:w-88 transition-all duration-300">
+      <div className="bg-cozy-ivory border-2 border-cozy-wood/20 backdrop-blur-md rounded-2xl shadow-2xl p-3 w-full md:w-88 transition-all duration-300">
         <div className="flex items-center justify-between gap-3">
           {/* Track Info */}
           <button 
@@ -196,6 +223,27 @@ export const AudioPlayerMini: React.FC<AudioPlayerMiniProps> = ({
             >
               {isPlaying ? <Pause size={16} fill="currentColor" /> : <Play size={16} className="ml-0.5" fill="currentColor" />}
             </button>
+          </div>
+        </div>
+
+        {/* Music Progress Bar (Thanh tiến trình nhạc) */}
+        <div className="mt-3 px-1 space-y-1">
+          <input
+            type="range"
+            min="0"
+            max={duration || 100}
+            step="0.1"
+            value={currentTime}
+            onChange={handleProgressChange}
+            className="w-full h-1 bg-cozy-wood/10 rounded-lg appearance-none cursor-pointer accent-cozy-wood focus:outline-none"
+            aria-label="Tiến trình nhạc"
+            style={{
+              background: `linear-gradient(to right, #5C4E43 0%, #5C4E43 ${((currentTime / (duration || 100)) * 100).toFixed(1)}%, rgba(92, 78, 67, 0.1) ${((currentTime / (duration || 100)) * 100).toFixed(1)}%, rgba(92, 78, 67, 0.1) 100%)`
+            }}
+          />
+          <div className="flex justify-between text-[10px] font-mono text-cozy-dark/50">
+            <span>{formatTime(currentTime)}</span>
+            <span>{formatTime(duration)}</span>
           </div>
         </div>
 

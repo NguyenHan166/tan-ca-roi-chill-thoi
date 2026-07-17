@@ -1,5 +1,6 @@
 import React from 'react';
-import { Mail, Facebook, Instagram, Sparkles, Heart } from 'lucide-react';
+import { Mail, Facebook, Instagram, Heart } from 'lucide-react';
+import { CozyLogo } from '../components/CozyLogo';
 
 export const Footer: React.FC = () => {
   const handleScrollToTop = () => {
@@ -24,9 +25,7 @@ export const Footer: React.FC = () => {
               onClick={handleScrollToTop}
               className="flex items-center gap-2 group text-left cursor-pointer focus:outline-none"
             >
-              <div className="w-8 h-8 rounded-full bg-cozy-wood flex items-center justify-center text-cozy-ivory">
-                <Sparkles size={14} className="fill-cozy-warm-yellow text-cozy-warm-yellow" />
-              </div>
+              <CozyLogo size={36} />
               <span className="font-serif text-lg font-bold tracking-tight text-cozy-dark">
                 Tan Ca Rồi
               </span>

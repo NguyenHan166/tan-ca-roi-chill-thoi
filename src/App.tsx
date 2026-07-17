@@ -134,6 +134,8 @@ export default function App() {
         activeTheme={activeTheme}
         onChangeTheme={setActiveTheme}
         onToast={addToast}
+        activeTrackId={activeTrackId}
+        onChangeTrack={setActiveTrackId}
       />
 
       {/* 2. Primary Layout Sections */}

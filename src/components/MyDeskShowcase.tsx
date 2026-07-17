@@ -79,7 +79,6 @@ export const MyDeskShowcase: React.FC<MyDeskShowcaseProps> = ({ onToast }) => {
 
   const handleAngleChange = (idx: number) => {
     setActiveAngleIdx(idx);
-    onToast(`Ghé thăm góc nhỏ: ${deskAngles[idx].name} 📸`, 'info');
   };
 
   const handleLikeAngle = (id: string, e: React.MouseEvent) => {
@@ -87,11 +86,9 @@ export const MyDeskShowcase: React.FC<MyDeskShowcaseProps> = ({ onToast }) => {
     if (hasLiked[id]) {
       setLikesCount(prev => ({ ...prev, [id]: prev[id] - 1 }));
       setHasLiked(prev => ({ ...prev, [id]: false }));
-      onToast('Bỏ thích góc nhỏ này.', 'info');
     } else {
       setLikesCount(prev => ({ ...prev, [id]: prev[id] + 1 }));
       setHasLiked(prev => ({ ...prev, [id]: true }));
-      onToast('Cảm ơn bạn đã yêu thích góc bình yên của tụi mình! ❤️✨', 'heart');
     }
   };
 

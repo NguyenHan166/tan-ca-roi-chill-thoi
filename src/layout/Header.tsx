@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Volume2, VolumeX, Menu, X, Heart, Sparkles } from 'lucide-react';
+import { Volume2, VolumeX, Menu, X, Heart, Sparkles, Music, CloudRain, Coffee, Trees } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { CozyLogo } from '../components/CozyLogo';
+import { tracks } from '../components/AudioPlayerMini';
 
 interface HeaderProps {
   isAudioPlaying: boolean;
@@ -10,6 +12,8 @@ interface HeaderProps {
   activeTheme: 'morning' | 'afternoon' | 'evening';
   onChangeTheme: (theme: 'morning' | 'afternoon' | 'evening') => void;
   onToast: (msg: string, type: 'info' | 'success' | 'heart' | 'error') => void;
+  activeTrackId?: string;
+  onChangeTrack?: (trackId: string) => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -20,9 +24,24 @@ export const Header: React.FC<HeaderProps> = ({
   activeTheme,
   onChangeTheme,
   onToast,
+  activeTrackId,
+  onChangeTrack,
 }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const renderTrackIcon = (name: string, size = 14) => {
+    switch (name) {
+      case 'CloudRain':
+        return <CloudRain size={size} />;
+      case 'Coffee':
+        return <Coffee size={size} />;
+      case 'Trees':
+        return <Trees size={size} />;
+      default:
+        return <Music size={size} />;
+    }
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -67,12 +86,15 @@ export const Header: React.FC<HeaderProps> = ({
           {/* Logo */}
           <button
             onClick={() => handleScrollTo('hero')}
-            className="flex items-center gap-1.5 group cursor-pointer focus:outline-none"
+            className="flex items-center gap-2 group cursor-pointer focus:outline-none"
           >
-            <div className="w-8 h-8 rounded-full bg-cozy-wood flex items-center justify-center text-cozy-ivory group-hover:bg-cozy-moss transition-colors">
-              <Sparkles size={14} className="fill-cozy-warm-yellow text-cozy-warm-yellow group-hover:rotate-12 transition-transform" />
-            </div>
-            <span className="font-serif text-lg font-bold text-cozy-dark tracking-tight">
+            <motion.div
+              whileHover={{ scale: 1.08, rotate: 3 }}
+              transition={{ duration: 0.4, ease: 'easeOut' }}
+            >
+              <CozyLogo size={38} />
+            </motion.div>
+            <span className="font-serif text-lg sm:text-xl font-bold text-cozy-dark tracking-tight group-hover:text-cozy-wood transition-colors">
               Tan Ca Rồi
             </span>
           </button>
@@ -98,7 +120,6 @@ export const Header: React.FC<HeaderProps> = ({
               <button
                 onClick={() => {
                   onChangeTheme('morning');
-                  onToast('Đã chuyển sang khung cảnh ban sáng ngập tràn nắng ấm.', 'success');
                 }}
                 className={`px-2 py-1 rounded-full transition-all cursor-pointer ${
                   activeTheme === 'morning' ? 'bg-cozy-wood text-cozy-ivory font-semibold' : 'text-cozy-dark/60 hover:text-cozy-dark'
@@ -109,7 +130,6 @@ export const Header: React.FC<HeaderProps> = ({
               <button
                 onClick={() => {
                   onChangeTheme('afternoon');
-                  onToast('Đã chuyển sang ánh hoàng hôn vàng cam nhẹ dịu.', 'success');
                 }}
                 className={`px-2 py-1 rounded-full transition-all cursor-pointer ${
                   activeTheme === 'afternoon' ? 'bg-cozy-wood text-cozy-ivory font-semibold' : 'text-cozy-dark/60 hover:text-cozy-dark'
@@ -120,7 +140,6 @@ export const Header: React.FC<HeaderProps> = ({
               <button
                 onClick={() => {
                   onChangeTheme('evening');
-                  onToast('Đã chuyển sang không gian đêm thanh tịnh, ấm cúng.', 'success');
                 }}
                 className={`px-2 py-1 rounded-full transition-all cursor-pointer ${
                   activeTheme === 'evening' ? 'bg-cozy-wood text-cozy-ivory font-semibold' : 'text-cozy-dark/60 hover:text-cozy-dark'
@@ -257,6 +276,64 @@ export const Header: React.FC<HeaderProps> = ({
                   </button>
                 </div>
               </div>
+
+              {/* Audio controller inside mobile menu */}
+              {activeTrackId && onChangeTrack && (
+                <div className="mb-6 bg-cozy-cream/30 rounded-2xl p-4 border border-cozy-wood/5">
+                  <div className="flex items-center justify-between mb-2.5">
+                    <span className="text-[10px] uppercase font-bold text-cozy-moss tracking-wider">
+                      Âm thanh nền:
+                    </span>
+                    <button
+                      onClick={onToggleAudio}
+                      className={`text-[11px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1 cursor-pointer transition-all ${
+                        isAudioPlaying
+                          ? 'bg-cozy-wood text-cozy-ivory'
+                          : 'bg-cozy-wood/5 text-cozy-dark hover:bg-cozy-wood/10'
+                      }`}
+                    >
+                      {isAudioPlaying ? (
+                        <>
+                          <Volume2 size={12} />
+                          <span>Đang Phát</span>
+                        </>
+                      ) : (
+                        <>
+                          <VolumeX size={12} />
+                          <span>Đang Tắt</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+
+                  <div className="flex flex-col gap-1.5">
+                    {tracks.map((track) => {
+                      const isActive = activeTrackId === track.id;
+                      return (
+                        <button
+                          key={track.id}
+                          onClick={() => {
+                            onChangeTrack(track.id);
+                            if (!isAudioPlaying) {
+                              onToggleAudio();
+                            }
+                          }}
+                          className={`w-full flex items-center gap-2.5 p-2 rounded-xl text-left text-xs transition-all duration-200 cursor-pointer ${
+                            isActive
+                              ? 'bg-cozy-wood text-cozy-ivory font-semibold shadow-sm'
+                              : 'bg-cozy-ivory hover:bg-cozy-cream/30 border border-cozy-wood/5 text-cozy-dark'
+                          }`}
+                        >
+                          <span className={isActive ? 'text-cozy-warm-yellow' : 'text-cozy-wood'}>
+                            {renderTrackIcon(track.iconName, 13)}
+                          </span>
+                          <span className="truncate">{track.name}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
 
               {/* Navigation list */}
               <div className="flex flex-col gap-4">
