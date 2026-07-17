@@ -105,6 +105,8 @@ export const MoodSection: React.FC<MoodSectionProps> = ({
                   <img
                     src={getMoodThumb(mood.id)}
                     alt=""
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-full object-cover grayscale transition-transform duration-1000 group-hover/card:scale-105"
                   />
                 </div>

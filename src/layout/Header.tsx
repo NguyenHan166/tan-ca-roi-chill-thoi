@@ -59,14 +59,14 @@ export const Header: React.FC<HeaderProps> = ({
 
     useEffect(() => {
         const handleScroll = () => {
-            if (window.scrollY > 40) {
-                setIsScrolled(true);
-            } else {
-                setIsScrolled(false);
-            }
+            const nextIsScrolled = window.scrollY > 40;
+            setIsScrolled((current) =>
+                current === nextIsScrolled ? current : nextIsScrolled,
+            );
         };
 
-        window.addEventListener("scroll", handleScroll);
+        handleScroll();
+        window.addEventListener("scroll", handleScroll, { passive: true });
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 

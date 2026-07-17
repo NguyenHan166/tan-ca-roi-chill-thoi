@@ -88,40 +88,36 @@ export const AudioPlayerMini: React.FC<AudioPlayerMiniProps> = ({
     const currentTrack =
         tracks.find((t) => t.id === activeTrackId) || tracks[0];
 
+    const createAudio = () => {
+        const audio = new Audio(currentTrack.url);
+        audio.loop = true;
+        audio.preload = "metadata";
+        audio.volume = isMuted ? 0 : volume;
+
+        audio.addEventListener("timeupdate", () => {
+            // The native event fires several times per second. Updating the UI at a
+            // lower cadence keeps the floating player responsive while music plays.
+            setCurrentTime((previous) =>
+                Math.abs(audio.currentTime - previous) >= 0.25
+                    ? audio.currentTime
+                    : previous,
+            );
+        });
+        const updateDuration = () => setDuration(audio.duration || 0);
+        audio.addEventListener("durationchange", updateDuration);
+        audio.addEventListener("loadedmetadata", updateDuration);
+
+        audioRef.current = audio;
+        return audio;
+    };
+
     useEffect(() => {
-        // Lazy initialize HTMLAudioElement
-        if (!audioRef.current) {
-            audioRef.current = new Audio(currentTrack.url);
-            audioRef.current.loop = true;
-        }
-
-        const audio = audioRef.current;
-
-        const handleTimeUpdate = () => {
-            setCurrentTime(audio.currentTime);
-        };
-
-        const handleDurationChange = () => {
-            setDuration(audio.duration || 0);
-        };
-
-        audio.addEventListener("timeupdate", handleTimeUpdate);
-        audio.addEventListener("durationchange", handleDurationChange);
-        audio.addEventListener("loadedmetadata", handleDurationChange);
-
         return () => {
-            if (audio) {
-                audio.pause();
-                audio.removeEventListener("timeupdate", handleTimeUpdate);
-                audio.removeEventListener(
-                    "durationchange",
-                    handleDurationChange,
-                );
-                audio.removeEventListener(
-                    "loadedmetadata",
-                    handleDurationChange,
-                );
-            }
+            const audio = audioRef.current;
+            if (!audio) return;
+            audio.pause();
+            audio.removeAttribute("src");
+            audio.load();
             audioRef.current = null;
         };
     }, []);
@@ -151,15 +147,14 @@ export const AudioPlayerMini: React.FC<AudioPlayerMiniProps> = ({
 
     // Sync playing state
     useEffect(() => {
-        if (audioRef.current) {
-            if (isPlaying) {
-                audioRef.current.play().catch((err) => {
+        if (isPlaying) {
+            const audio = audioRef.current || createAudio();
+            audio.play().catch((err) => {
                     console.warn("Audio play blocked: ", err);
                     onPlayPauseToggle(false);
-                });
-            } else {
-                audioRef.current.pause();
-            }
+            });
+        } else {
+            audioRef.current?.pause();
         }
     }, [isPlaying]);
 

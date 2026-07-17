@@ -1,14 +1,28 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 export const ParallaxQuoteSection: React.FC = () => {
-  const [offsetY, setOffsetY] = useState(0);
+  const backgroundRef = useRef<HTMLDivElement>(null);
+  const frameRef = useRef<number | null>(null);
 
   useEffect(() => {
     const handleScroll = () => {
-      setOffsetY(window.scrollY);
+      if (frameRef.current !== null) return;
+
+      frameRef.current = window.requestAnimationFrame(() => {
+        if (backgroundRef.current) {
+          const offset = (window.scrollY - 2000) * 0.1;
+          backgroundRef.current.style.transform = `translate3d(0, ${offset}px, 0) scale(1.15)`;
+        }
+        frameRef.current = null;
+      });
     };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (frameRef.current !== null) window.cancelAnimationFrame(frameRef.current);
+    };
   }, []);
 
   return (
@@ -17,17 +31,17 @@ export const ParallaxQuoteSection: React.FC = () => {
       id="parallax-quote-section"
     >
       {/* Background with parallax scroll effect */}
-      <div 
+      <div
+        ref={backgroundRef}
         className="absolute inset-0 z-0"
-        style={{
-          transform: `translateY(${(offsetY - 2000) * 0.1}px) scale(1.15)`,
-          transition: 'transform 0.1s ease-out'
-        }}
+        style={{ willChange: 'transform' }}
       >
         <img
           src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1600&auto=format&fit=crop"
           alt="Đường đi làm ở quê lúc chiều tà"
           referrerPolicy="no-referrer"
+          loading="lazy"
+          decoding="async"
           className="w-full h-full object-cover opacity-60"
         />
         {/* Soft vignette dusk shading */}

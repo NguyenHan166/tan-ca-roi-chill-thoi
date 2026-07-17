@@ -191,6 +191,8 @@ export const JournalItem: React.FC<JournalItemProps> = ({ journal, onToast, acti
                   <img
                     src={journal.thumbnail}
                     alt={journal.title}
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-full object-cover filter brightness-[0.96]"
                   />
                 </div>

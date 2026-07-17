@@ -50,43 +50,18 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             id="hero"
             className="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden bg-[#2B241E] bg-grain"
         >
-            {/* Background Cinematic Image with soft cross-fade transition */}
+            {/* Only load the active background. Loading all three full-size images
+                on first paint makes mobile interactions noticeably less responsive. */}
             <div className="absolute inset-0 z-0">
-                {/* Morning Background */}
-                <div
-                    className={`absolute inset-0 transition-opacity duration-[1500ms] ease-in-out ${activeTheme === "morning" ? "opacity-35 z-10" : "opacity-0 z-0"}`}
-                >
-                    <img
-                        src="https://images.unsplash.com/photo-1517502884422-41eaaced0168?q=80&w=1600"
-                        alt="Morning cozy workstation background"
-                        referrerPolicy="no-referrer"
-                        className="w-full h-full object-cover scale-102"
-                    />
-                </div>
-
-                {/* Afternoon Background */}
-                <div
-                    className={`absolute inset-0 transition-opacity duration-[1500ms] ease-in-out ${activeTheme === "afternoon" ? "opacity-35 z-10" : "opacity-0 z-0"}`}
-                >
-                    <img
-                        src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=1600"
-                        alt="Afternoon golden sunshine background"
-                        referrerPolicy="no-referrer"
-                        className="w-full h-full object-cover scale-102"
-                    />
-                </div>
-
-                {/* Evening Background */}
-                <div
-                    className={`absolute inset-0 transition-opacity duration-[1500ms] ease-in-out ${activeTheme === "evening" ? "opacity-35 z-10" : "opacity-0 z-0"}`}
-                >
-                    <img
-                        src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1600"
-                        alt="Evening warm twilight background"
-                        referrerPolicy="no-referrer"
-                        className="w-full h-full object-cover scale-102"
-                    />
-                </div>
+                <img
+                    key={activeTheme}
+                    src={getThemeBackground()}
+                    alt="Cozy workstation background"
+                    referrerPolicy="no-referrer"
+                    fetchPriority="high"
+                    decoding="async"
+                    className="absolute inset-0 w-full h-full object-cover scale-102 opacity-35 transition-opacity duration-[700ms]"
+                />
 
                 {/* Dynamic theme color treatment overlay */}
                 <div

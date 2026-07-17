@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Header } from './layout/Header';
 import { Footer } from './layout/Footer';
 import { HeroSection } from './sections/HeroSection';
@@ -63,16 +63,16 @@ export default function App() {
   }, [activeTheme]);
 
   // Show Toast helper
-  const addToast = (message: string, type: ToastMessage['type'] = 'info') => {
+  const addToast = useCallback((message: string, type: ToastMessage['type'] = 'info') => {
     // No-op: Disable all notifications/toasts as requested
-  };
+  }, []);
 
-  const removeToast = (id: string) => {
+  const removeToast = useCallback((id: string) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
-  };
+  }, []);
 
   // Sync ambient audio when mood selection changes
-  const handleSelectMood = (moodId: string) => {
+  const handleSelectMood = useCallback((moodId: string) => {
     setSelectedMoodId(moodId);
     
     // Auto-recommend a track
@@ -81,19 +81,19 @@ export default function App() {
       setActiveTrackId(selectedMood.recommendedAudioId);
       addToast(`Đã gợi ý bản âm thanh phù hợp với trạng thái của bạn.`, 'success');
     }
-  };
+  }, [addToast]);
 
-  const handleClearMoodFilter = () => {
+  const handleClearMoodFilter = useCallback(() => {
     setSelectedMoodId('');
     addToast('Đã xóa bộ lọc trạng thái cảm xúc.', 'info');
-  };
+  }, [addToast]);
 
-  const handleToggleFavorite = (productId: string) => {
+  const handleToggleFavorite = useCallback((productId: string) => {
     const updated = toggleFavorite(productId);
     setFavoritedIds(updated);
-  };
+  }, []);
 
-  const handleStartChillMode = () => {
+  const handleStartChillMode = useCallback(() => {
     setIsAudioPlaying(true);
     addToast('Đã kích hoạt chế độ chill! Hãy lắng nghe âm thanh rì rào rì rầm nhé.', 'success');
     
@@ -102,17 +102,28 @@ export default function App() {
     if (el) {
       el.scrollIntoView({ behavior: 'smooth' });
     }
-  };
+  }, [addToast]);
 
-  const handleScrollToDesk = () => {
+  const handleScrollToDesk = useCallback(() => {
     const el = document.getElementById('cozy-desk');
     if (el) {
       el.scrollIntoView({ behavior: 'smooth' });
     }
-  };
+  }, []);
+
+  const handleToggleAudio = useCallback(() => {
+    setIsAudioPlaying((playing) => !playing);
+  }, []);
+
+  const handleOpenFavorites = useCallback(() => {
+    setIsFavoritesOpen(true);
+  }, []);
 
   // Extract favorited products list
-  const favoritedProductsList = products.filter((p) => favoritedIds.includes(p.id));
+  const favoritedProductsList = useMemo(
+    () => products.filter((p) => favoritedIds.includes(p.id)),
+    [favoritedIds],
+  );
 
   // Determine top-level background class based on active time theme
   const getThemeWrapperClass = () => {
@@ -134,9 +145,9 @@ export default function App() {
       {/* 1. Sticky Navigation Header */}
       <Header
         isAudioPlaying={isAudioPlaying}
-        onToggleAudio={() => setIsAudioPlaying(!isAudioPlaying)}
+        onToggleAudio={handleToggleAudio}
         savedCount={favoritedIds.length}
-        onOpenFavorites={() => setIsFavoritesOpen(true)}
+        onOpenFavorites={handleOpenFavorites}
         activeTheme={activeTheme}
         onChangeTheme={setActiveTheme}
         onToast={addToast}
