@@ -19,13 +19,13 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   const getThemeOverlay = () => {
     switch (activeTheme) {
       case 'morning':
-        return 'bg-amber-100/10 mix-blend-soft-light backdrop-brightness-110';
+        return 'bg-[#2B241E]/40 backdrop-brightness-[0.8]';
       case 'afternoon':
-        return 'bg-[#E8B86D]/20 mix-blend-color-burn backdrop-contrast-105';
+        return 'bg-[#2B241E]/40 backdrop-brightness-[0.75]';
       case 'evening':
-        return 'bg-[#1F1B17]/40 backdrop-brightness-[0.75]';
+        return 'bg-[#1F1B17]/55 backdrop-brightness-[0.7]';
       default:
-        return 'bg-black/30';
+        return 'bg-black/40';
     }
   };
 
@@ -50,19 +50,43 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
       id="hero"
       className="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden bg-[#2B241E] bg-grain"
     >
-      {/* Background Cinematic Image with transition */}
+      {/* Background Cinematic Image with soft cross-fade transition */}
       <div className="absolute inset-0 z-0">
-        <img
-          src={getThemeBackground()}
-          alt="Cinematic desk setup background"
-          referrerPolicy="no-referrer"
-          className="w-full h-full object-cover opacity-60 transition-all duration-1000 ease-in-out scale-102"
-        />
+        {/* Morning Background */}
+        <div className={`absolute inset-0 transition-opacity duration-[1500ms] ease-in-out ${activeTheme === 'morning' ? 'opacity-35 z-10' : 'opacity-0 z-0'}`}>
+          <img
+            src="https://images.unsplash.com/photo-1517502884422-41eaaced0168?q=80&w=1600"
+            alt="Morning cozy workstation background"
+            referrerPolicy="no-referrer"
+            className="w-full h-full object-cover scale-102"
+          />
+        </div>
+
+        {/* Afternoon Background */}
+        <div className={`absolute inset-0 transition-opacity duration-[1500ms] ease-in-out ${activeTheme === 'afternoon' ? 'opacity-35 z-10' : 'opacity-0 z-0'}`}>
+          <img
+            src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=1600"
+            alt="Afternoon golden sunshine background"
+            referrerPolicy="no-referrer"
+            className="w-full h-full object-cover scale-102"
+          />
+        </div>
+
+        {/* Evening Background */}
+        <div className={`absolute inset-0 transition-opacity duration-[1500ms] ease-in-out ${activeTheme === 'evening' ? 'opacity-35 z-10' : 'opacity-0 z-0'}`}>
+          <img
+            src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1600"
+            alt="Evening warm twilight background"
+            referrerPolicy="no-referrer"
+            className="w-full h-full object-cover scale-102"
+          />
+        </div>
+
         {/* Dynamic theme color treatment overlay */}
-        <div className={`absolute inset-0 transition-all duration-1000 ${getThemeOverlay()}`} />
+        <div className={`absolute inset-0 z-20 transition-all duration-[1500ms] ease-in-out ${getThemeOverlay()}`} />
         
         {/* Extra vignette shading for text readability */}
-        <div className="absolute inset-0 bg-gradient-to-t from-cozy-dark via-transparent to-cozy-dark/25" />
+        <div className="absolute inset-0 z-30 bg-gradient-to-t from-[#1F1B17] via-transparent to-[#1F1B17]/35" />
       </div>
 
       {/* Floating Leaves or Dust particles simulation */}
@@ -85,10 +109,10 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.1 }}
-          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-cozy-ivory/10 backdrop-blur-md border border-cozy-ivory/10"
+          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-cozy-ivory/15"
         >
           <Sparkles size={11} className="text-cozy-warm-yellow fill-cozy-warm-yellow animate-pulse" />
-          <span className="text-[10px] md:text-xs font-semibold tracking-widest text-cozy-cream uppercase">
+          <span className="text-[10px] md:text-xs font-bold tracking-widest text-white uppercase drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">
             Chậm lại một chút
           </span>
         </motion.div>
@@ -99,10 +123,10 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
-            className="font-serif text-4xl sm:text-5xl md:text-7xl font-bold text-cozy-ivory tracking-tight leading-[1.1] whitespace-pre-line"
+            className="font-serif text-4xl sm:text-5xl md:text-7xl font-bold text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.8)] tracking-tight leading-[1.1] whitespace-pre-line"
           >
             TAN CA RỒI,<br />
-            <span className="text-cozy-warm-yellow relative inline-block">
+            <span className="text-cozy-warm-yellow relative inline-block drop-shadow-[0_2px_10px_rgba(0,0,0,0.6)]">
               CHILL THÔI.
               <span className="absolute -bottom-2 left-0 w-full h-1 bg-cozy-warm-yellow/30 rounded-full" />
             </span>
@@ -114,7 +138,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1, delay: 0.5 }}
-          className="max-w-xl mx-auto text-sm md:text-base font-medium text-cozy-cream/80 leading-relaxed font-sans"
+          className="max-w-xl mx-auto text-sm md:text-base font-semibold text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)] leading-relaxed font-sans"
         >
           Một góc nhỏ dành cho những người đã có một ngày hơi dài. Bật chút âm thanh rì rào, chọn một tâm trạng bất kỳ và ở lại đây bao lâu cũng được nhé.
         </motion.p>

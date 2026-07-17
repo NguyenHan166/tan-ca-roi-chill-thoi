@@ -227,7 +227,7 @@ export const AudioPlayerMini: React.FC<AudioPlayerMiniProps> = ({
         </div>
 
         {/* Music Progress Bar (Thanh tiến trình nhạc) */}
-        <div className="mt-3 px-1 space-y-1">
+        <div className="mt-3 px-1 space-y-1.5">
           <input
             type="range"
             min="0"
@@ -235,10 +235,10 @@ export const AudioPlayerMini: React.FC<AudioPlayerMiniProps> = ({
             step="0.1"
             value={currentTime}
             onChange={handleProgressChange}
-            className="w-full h-1 bg-cozy-wood/10 rounded-lg appearance-none cursor-pointer accent-cozy-wood focus:outline-none"
+            className="cozy-slider cursor-pointer focus:outline-none"
             aria-label="Tiến trình nhạc"
             style={{
-              background: `linear-gradient(to right, #5C4E43 0%, #5C4E43 ${((currentTime / (duration || 100)) * 100).toFixed(1)}%, rgba(92, 78, 67, 0.1) ${((currentTime / (duration || 100)) * 100).toFixed(1)}%, rgba(92, 78, 67, 0.1) 100%)`
+              background: `linear-gradient(to right, #775B45 0%, #775B45 ${((currentTime / (duration || 100)) * 100).toFixed(1)}%, rgba(119, 91, 69, 0.15) ${((currentTime / (duration || 100)) * 100).toFixed(1)}%, rgba(119, 91, 69, 0.15) 100%)`
             }}
           />
           <div className="flex justify-between text-[10px] font-mono text-cozy-dark/50">

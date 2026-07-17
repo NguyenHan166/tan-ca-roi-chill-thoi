@@ -84,3 +84,46 @@
   background-color: rgba(232, 184, 109, 0.4);
   color: #302922;
 }
+
+/* Custom range slider styling */
+.cozy-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 9999px;
+  outline: none;
+}
+
+.cozy-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #775B45;
+  cursor: pointer;
+  border: 2px solid #FFFDF8;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  transition: transform 0.1s;
+}
+
+.cozy-slider::-webkit-slider-thumb:active {
+  transform: scale(1.2);
+}
+
+.cozy-slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #775B45;
+  cursor: pointer;
+  border: 2px solid #FFFDF8;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  transition: transform 0.1s;
+}
+
+.cozy-slider::-moz-range-thumb:active {
+  transform: scale(1.2);
+}
+

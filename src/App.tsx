@@ -52,13 +52,7 @@ export default function App() {
 
   // Show Toast helper
   const addToast = (message: string, type: ToastMessage['type'] = 'info') => {
-    const id = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
-    setToasts((prev) => [...prev, { id, message, type }]);
-    
-    // Automatically dismiss toast after 2.2 seconds
-    setTimeout(() => {
-      removeToast(id);
-    }, 2200);
+    // No-op: Disable all notifications/toasts as requested
   };
 
   const removeToast = (id: string) => {
