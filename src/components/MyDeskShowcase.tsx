@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Sparkles, Compass, Heart, Camera, Coffee, Moon, Sun, ChevronRight } from 'lucide-react';
+import { TimeTheme } from '../types';
 
 interface MyDeskShowcaseProps {
   onToast: (msg: string, type: 'info' | 'success' | 'heart' | 'error') => void;
+  activeTheme: TimeTheme;
 }
 
 interface DeskAngle {
@@ -66,7 +68,7 @@ const deskAngles: DeskAngle[] = [
   }
 ];
 
-export const MyDeskShowcase: React.FC<MyDeskShowcaseProps> = ({ onToast }) => {
+export const MyDeskShowcase: React.FC<MyDeskShowcaseProps> = ({ activeTheme, onToast }) => {
   const [activeAngleIdx, setActiveAngleIdx] = useState(0);
   const [likesCount, setLikesCount] = useState<Record<string, number>>({
     sunset: 42,
@@ -75,10 +77,22 @@ export const MyDeskShowcase: React.FC<MyDeskShowcaseProps> = ({ onToast }) => {
   });
   const [hasLiked, setHasLiked] = useState<Record<string, boolean>>({});
 
+  // Auto sync desk angle when header activeTheme changes!
+  useEffect(() => {
+    if (activeTheme === 'morning') {
+      setActiveAngleIdx(2); // Morning desk
+    } else if (activeTheme === 'afternoon') {
+      setActiveAngleIdx(0); // Sunset desk
+    } else if (activeTheme === 'evening') {
+      setActiveAngleIdx(1); // Night rain desk
+    }
+  }, [activeTheme]);
+
   const activeAngle = deskAngles[activeAngleIdx];
 
   const handleAngleChange = (idx: number) => {
     setActiveAngleIdx(idx);
+    onToast(`Chuyển góc nhìn: ${deskAngles[idx].name} 📸`, 'info');
   };
 
   const handleLikeAngle = (id: string, e: React.MouseEvent) => {
@@ -89,22 +103,33 @@ export const MyDeskShowcase: React.FC<MyDeskShowcaseProps> = ({ onToast }) => {
     } else {
       setLikesCount(prev => ({ ...prev, [id]: prev[id] + 1 }));
       setHasLiked(prev => ({ ...prev, [id]: true }));
+      onToast(`Bạn đã thả tim góc này! Cảm ơn sự đồng điệu nhé ❤️`, 'heart');
     }
   };
 
   return (
-    <div className="w-full bg-[#FFFDF8] border border-cozy-wood/15 rounded-3xl p-6 md:p-10 flex flex-col gap-10 shadow-md relative overflow-hidden bg-grain">
+    <div className={`w-full border rounded-3xl p-6 md:p-10 flex flex-col gap-10 shadow-md relative overflow-hidden bg-grain transition-all duration-[1200ms] ${
+      activeTheme === 'evening'
+        ? 'bg-[#241D19]/60 border-[#5A483B]/40 text-[#EBE4DC]'
+        : 'bg-cozy-ivory border-cozy-wood/15 text-cozy-dark'
+    }`}>
       
       {/* Decorative top title section */}
       <div className="text-center max-w-xl mx-auto space-y-3">
-        <span className="text-xs sm:text-sm font-bold text-cozy-moss uppercase tracking-widest flex items-center justify-center gap-1.5">
+        <span className={`text-xs sm:text-sm font-bold uppercase tracking-widest flex items-center justify-center gap-1.5 transition-colors ${
+          activeTheme === 'evening' ? 'text-cozy-warm-yellow' : 'text-cozy-moss'
+        }`}>
           <Sparkles size={14} className="text-cozy-warm-yellow fill-cozy-warm-yellow" />
           KHÔNG GIAN TRẢI NGHIỆM TƯƠNG TÁC
         </span>
-        <h3 className="font-serif text-3xl md:text-4xl font-semibold text-cozy-dark">
+        <h3 className={`font-serif text-3xl md:text-4xl font-semibold transition-colors ${
+          activeTheme === 'evening' ? 'text-[#EBE4DC]' : 'text-cozy-dark'
+        }`}>
           Góc Nhỏ Bình Yên Của Tụi Mình
         </h3>
-        <p className="text-sm md:text-base text-cozy-dark/85 leading-relaxed font-sans max-w-lg mx-auto">
+        <p className={`text-sm md:text-base leading-relaxed font-sans max-w-lg mx-auto transition-colors ${
+          activeTheme === 'evening' ? 'text-[#EBE4DC]/80' : 'text-cozy-dark/85'
+        }`}>
           Mỗi bức ảnh dưới đây đại diện cho một góc bàn làm việc thực tế nơi tụi mình thả neo tâm hồn sau những giờ tan ca hối hả. Hãy chạm để thay đổi góc nhìn và lắng nghe những câu chuyện thầm lặng nhé.
         </p>
       </div>
@@ -119,8 +144,12 @@ export const MyDeskShowcase: React.FC<MyDeskShowcaseProps> = ({ onToast }) => {
               onClick={() => handleAngleChange(idx)}
               className={`px-5 py-3 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-500 flex items-center gap-2 cursor-pointer border ${
                 isActive
-                  ? 'bg-cozy-wood border-cozy-wood text-[#FFFDF8] shadow-md -translate-y-0.5'
-                  : 'bg-cozy-cream/30 border-cozy-wood/15 text-cozy-dark hover:bg-cozy-cream/60'
+                  ? activeTheme === 'evening'
+                    ? 'bg-cozy-warm-yellow border-cozy-warm-yellow text-[#181310] shadow-md -translate-y-0.5 font-bold'
+                    : 'bg-cozy-wood border-cozy-wood text-[#FFFDF8] shadow-md -translate-y-0.5 font-bold'
+                  : activeTheme === 'evening'
+                    ? 'bg-[#1C1713] border-[#5A483B]/30 text-[#EBE4DC]/80 hover:bg-[#2D231D]'
+                    : 'bg-cozy-cream/30 border-cozy-wood/15 text-cozy-dark hover:bg-cozy-cream/60'
               }`}
             >
               {angle.icon}
@@ -146,13 +175,19 @@ export const MyDeskShowcase: React.FC<MyDeskShowcaseProps> = ({ onToast }) => {
                 className="w-full"
               >
                 {/* Polaroid Frame Container */}
-                <div className="bg-[#FCFAF2] border border-cozy-wood/20 rounded-3xl p-4 sm:p-5 shadow-xl hover:shadow-2xl transition-all duration-500 hover:border-cozy-wood/35 group cursor-pointer relative overflow-hidden">
+                <div className={`border rounded-3xl p-4 sm:p-5 shadow-xl hover:shadow-2xl transition-all duration-500 group cursor-pointer relative overflow-hidden ${
+                  activeTheme === 'evening'
+                    ? 'bg-[#1C1713] border-[#5A483B]/40 hover:border-cozy-warm-yellow/50'
+                    : 'bg-[#FCFAF2] border-cozy-wood/20 hover:border-cozy-wood/35'
+                }`}>
                   
                   {/* Hover visual overlay to simulate lens flare or warm dust particles */}
                   <div className="absolute inset-0 bg-gradient-to-tr from-orange-400/0 via-white/0 to-orange-400/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none z-10" />
 
                   {/* Image wrapper with zoom-on-hover effect */}
-                  <div className="aspect-[4/3] rounded-2xl overflow-hidden bg-cozy-cream border border-cozy-wood/10 relative">
+                  <div className={`aspect-[4/3] rounded-2xl overflow-hidden relative border ${
+                    activeTheme === 'evening' ? 'bg-[#241D19] border-[#5A483B]/20' : 'bg-cozy-cream border-cozy-wood/10'
+                  }`}>
                     <motion.img
                       src={activeAngle.image}
                       alt={activeAngle.name}
@@ -172,10 +207,14 @@ export const MyDeskShowcase: React.FC<MyDeskShowcaseProps> = ({ onToast }) => {
                   {/* Bottom section of the Polaroid - handwritten title and heart trigger */}
                   <div className="pt-4 flex items-center justify-between">
                     <div>
-                      <p className="font-serif italic text-base text-cozy-dark font-bold">
+                      <p className={`font-serif italic text-base font-bold transition-colors ${
+                        activeTheme === 'evening' ? 'text-cozy-warm-yellow' : 'text-cozy-dark'
+                      }`}>
                         — {activeAngle.name}
                       </p>
-                      <p className="text-[10px] sm:text-xs text-cozy-dark/50 font-sans tracking-wide">
+                      <p className={`text-[10px] sm:text-xs font-sans tracking-wide transition-colors ${
+                        activeTheme === 'evening' ? 'text-[#EBE4DC]/50' : 'text-cozy-dark/50'
+                      }`}>
                         Ảnh thực tế được chụp bằng máy phim cơ
                       </p>
                     </div>
@@ -185,14 +224,16 @@ export const MyDeskShowcase: React.FC<MyDeskShowcaseProps> = ({ onToast }) => {
                       onClick={(e) => handleLikeAngle(activeAngle.id, e)}
                       className={`flex items-center gap-1.5 px-3.5 py-2 rounded-full border transition-all duration-300 cursor-pointer ${
                         hasLiked[activeAngle.id]
-                          ? 'bg-red-50 border-red-200 text-red-500 font-bold'
-                          : 'bg-cozy-cream/30 border-cozy-wood/10 text-cozy-dark/60 hover:border-red-200 hover:text-red-500'
+                          ? 'bg-red-500 border-red-500 text-white font-bold'
+                          : activeTheme === 'evening'
+                            ? 'bg-[#241D19] border-[#5A483B]/40 text-[#EBE4DC]/60 hover:text-red-400 hover:border-red-400'
+                            : 'bg-cozy-cream/30 border-cozy-wood/10 text-cozy-dark/60 hover:border-red-200 hover:text-red-500'
                       }`}
                     >
                       <Heart 
                         size={14} 
                         className={`transition-transform duration-300 ${
-                          hasLiked[activeAngle.id] ? 'scale-110 text-red-500 fill-red-500' : 'group-hover:scale-110'
+                          hasLiked[activeAngle.id] ? 'scale-110 text-white fill-white' : 'group-hover:scale-110'
                         }`} 
                       />
                       <span className="text-xs font-mono font-bold">
@@ -224,35 +265,47 @@ export const MyDeskShowcase: React.FC<MyDeskShowcaseProps> = ({ onToast }) => {
             >
               {/* Cozy Header Subtitle */}
               <div className="space-y-1">
-                <span className="text-xs font-mono text-cozy-moss uppercase tracking-widest font-bold">
+                <span className={`text-xs font-mono uppercase tracking-widest font-bold transition-colors ${
+                  activeTheme === 'evening' ? 'text-cozy-warm-yellow' : 'text-cozy-moss'
+                }`}>
                   Lời nhắn từ chiếc góc nhỏ
                 </span>
-                <h4 className="font-serif text-xl sm:text-2xl font-semibold text-cozy-dark italic">
+                <h4 className={`font-serif text-xl sm:text-2xl font-semibold italic transition-colors ${
+                  activeTheme === 'evening' ? 'text-[#EBE4DC]' : 'text-cozy-dark'
+                }`}>
                   {activeAngle.timeOfDay}
                 </h4>
               </div>
 
               {/* Main quote callout - elegant serif displayed beautifully */}
-              <p className="font-serif text-xl sm:text-2xl text-cozy-dark leading-relaxed font-bold border-l-4 border-cozy-wood/30 pl-5 text-justify italic">
+              <p className={`font-serif text-xl sm:text-2xl leading-relaxed font-bold border-l-4 pl-5 text-justify italic transition-colors ${
+                activeTheme === 'evening' ? 'text-[#EBE4DC] border-cozy-warm-yellow/40' : 'text-cozy-dark border-cozy-wood/30'
+              }`}>
                 {activeAngle.mainQuote}
               </p>
 
               {/* Tagline text block */}
-              <p className="text-sm sm:text-base text-cozy-dark/85 leading-relaxed font-sans text-justify">
+              <p className={`text-sm sm:text-base leading-relaxed font-sans text-justify transition-colors ${
+                activeTheme === 'evening' ? 'text-[#EBE4DC]/80' : 'text-cozy-dark/85'
+              }`}>
                 {activeAngle.tagline}
               </p>
 
               {/* Curated list points detailing what makes it peaceful */}
               <div className="space-y-3 pt-2">
-                <p className="text-xs uppercase tracking-widest font-mono font-bold text-cozy-dark/50">
+                <p className={`text-xs uppercase tracking-widest font-mono font-bold transition-colors ${
+                  activeTheme === 'evening' ? 'text-[#EBE4DC]/50' : 'text-cozy-dark/50'
+                }`}>
                   Chi tiết nâng niu giác quan:
                 </p>
                 {activeAngle.bullets.map((bullet, index) => (
                   <div key={index} className="flex items-start gap-3">
-                    <span className="text-cozy-moss text-base leading-none select-none mt-1">
-                      <ChevronRight size={14} className="text-cozy-wood" />
+                    <span className="text-base leading-none select-none mt-1 shrink-0">
+                      <ChevronRight size={14} className={activeTheme === 'evening' ? 'text-cozy-warm-yellow' : 'text-cozy-wood'} />
                     </span>
-                    <p className="text-sm sm:text-base text-cozy-dark/80 font-sans">
+                    <p className={`text-sm sm:text-base font-sans transition-colors ${
+                      activeTheme === 'evening' ? 'text-[#EBE4DC]/80' : 'text-cozy-dark/80'
+                    }`}>
                       {bullet}
                     </p>
                   </div>
@@ -260,12 +313,22 @@ export const MyDeskShowcase: React.FC<MyDeskShowcaseProps> = ({ onToast }) => {
               </div>
 
               {/* Quick music integration block */}
-              <div className="bg-cozy-moss/5 border border-cozy-moss/10 rounded-2xl p-4 flex items-center gap-4.5 mt-4">
+              <div className={`border rounded-2xl p-4 flex items-center gap-4.5 mt-4 transition-all duration-500 ${
+                activeTheme === 'evening'
+                  ? 'bg-cozy-warm-yellow/5 border-cozy-warm-yellow/20'
+                  : 'bg-cozy-moss/5 border-cozy-moss/10'
+              }`}>
                 <span className="text-2xl">📻</span>
                 <div className="space-y-0.5">
-                  <p className="text-[10px] font-mono text-cozy-dark/50 uppercase leading-none">Tần số đề xuất phát kèm:</p>
-                  <p className="text-xs sm:text-sm text-cozy-dark font-bold mt-1">
-                    Góc này phát cùng bản <span className="text-cozy-moss font-bold underline">{activeAngle.ambientSoundName}</span> là trọn vẹn nhất.
+                  <p className={`text-[10px] font-mono uppercase leading-none ${
+                    activeTheme === 'evening' ? 'text-[#EBE4DC]/50' : 'text-cozy-dark/50'
+                  }`}>Tần số đề xuất phát kèm:</p>
+                  <p className={`text-xs sm:text-sm font-bold mt-1 transition-colors ${
+                    activeTheme === 'evening' ? 'text-[#EBE4DC]' : 'text-cozy-dark'
+                  }`}>
+                    Góc này phát cùng bản <span className={`font-bold underline ${
+                      activeTheme === 'evening' ? 'text-cozy-warm-yellow' : 'text-cozy-moss'
+                    }`}>{activeAngle.ambientSoundName}</span> là trọn vẹn nhất.
                   </p>
                 </div>
               </div>

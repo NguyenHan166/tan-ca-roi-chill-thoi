@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Product } from '../types';
+import { Product, TimeTheme } from '../types';
 import { products } from '../data/products';
 import { moods } from '../data/moods';
 import { ProductCard } from '../components/ProductCard';
@@ -12,6 +12,7 @@ interface ProductSectionProps {
   favoritedIds: string[];
   onToggleFavorite: (id: string) => void;
   onToast: (msg: string, type: 'info' | 'success' | 'heart' | 'error') => void;
+  activeTheme?: TimeTheme;
 }
 
 export const ProductSection: React.FC<ProductSectionProps> = ({
@@ -20,6 +21,7 @@ export const ProductSection: React.FC<ProductSectionProps> = ({
   favoritedIds,
   onToggleFavorite,
   onToast,
+  activeTheme = 'morning',
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>('Tất cả');
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
@@ -78,7 +80,11 @@ export const ProductSection: React.FC<ProductSectionProps> = ({
   return (
     <section
       id="products-showcase"
-      className="py-24 md:py-32 px-6 md:px-12 bg-cozy-cream/10 border-b border-cozy-wood/5 relative bg-grain"
+      className={`py-24 md:py-32 px-6 md:px-12 border-b relative bg-grain transition-all duration-[1200ms] ${
+        activeTheme === 'evening'
+          ? 'bg-[#181310] border-[#5A483B]/20 text-[#EBE4DC]'
+          : 'bg-cozy-cream/10 border-cozy-wood/5 text-cozy-dark'
+      }`}
     >
       {/* Inject custom marquee keyframe style */}
       <style>{`
@@ -102,14 +108,20 @@ export const ProductSection: React.FC<ProductSectionProps> = ({
         
         {/* Poetic Title Block */}
         <div className="text-center space-y-3 max-w-2xl mx-auto">
-          <span className="text-xs sm:text-sm font-bold uppercase tracking-[0.25em] text-cozy-moss flex items-center justify-center gap-1.5">
+          <span className={`text-xs sm:text-sm font-bold uppercase tracking-[0.25em] flex items-center justify-center gap-1.5 transition-colors ${
+            activeTheme === 'evening' ? 'text-cozy-warm-yellow' : 'text-cozy-moss'
+          }`}>
             <LayoutGrid size={13} />
             Mảnh ghép không gian
           </span>
-          <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-semibold text-cozy-dark">
+          <h2 className={`font-serif text-2xl sm:text-3xl md:text-4xl font-semibold transition-colors ${
+            activeTheme === 'evening' ? 'text-[#EBE4DC]' : 'text-cozy-dark'
+          }`}>
             Gợi ý tủ đồ chữa lành
           </h2>
-          <p className="text-sm sm:text-base text-cozy-dark/85 leading-relaxed font-serif italic">
+          <p className={`text-sm sm:text-base leading-relaxed font-serif italic transition-colors ${
+            activeTheme === 'evening' ? 'text-[#EBE4DC]/80' : 'text-cozy-dark/85'
+          }`}>
             “Những đồ vật thầm lặng được tuyển lựa để vỗ về giác quan, thắp sáng không gian riêng tư của bạn mỗi khi tan ca.”
           </p>
         </div>
@@ -117,8 +129,12 @@ export const ProductSection: React.FC<ProductSectionProps> = ({
         {/* 1. AUTO-SCROLLING ROW / MARQUEE (Hiệu ứng dây chuyền tự động) */}
         <div className="relative w-full overflow-hidden py-4 -mx-6 px-6 md:-mx-12 md:px-12">
           {/* Subtle gradient overlays to blend edges beautifully */}
-          <div className="absolute inset-y-0 left-0 w-16 sm:w-28 bg-gradient-to-r from-[#FFFDF8] via-[#FFFDF8]/80 to-transparent z-10 pointer-events-none" />
-          <div className="absolute inset-y-0 right-0 w-16 sm:w-28 bg-gradient-to-l from-[#FFFDF8] via-[#FFFDF8]/80 to-transparent z-10 pointer-events-none" />
+          <div className={`absolute inset-y-0 left-0 w-16 sm:w-28 z-10 pointer-events-none transition-all duration-1000 ${
+            activeTheme === 'evening' ? 'from-[#181310] via-[#181310]/80 to-transparent' : 'from-[#FFFDF8] via-[#FFFDF8]/80 to-transparent'
+          }`} />
+          <div className={`absolute inset-y-0 right-0 w-16 sm:w-28 z-10 pointer-events-none transition-all duration-1000 ${
+            activeTheme === 'evening' ? 'from-[#181310] via-[#181310]/80 to-transparent' : 'from-[#FFFDF8] via-[#FFFDF8]/80 to-transparent'
+          }`} />
 
           {/* Scrolling chain container */}
           <div className="flex w-max animate-marquee-chain gap-6 md:gap-8 hover:cursor-grab active:cursor-grabbing">
@@ -132,6 +148,7 @@ export const ProductSection: React.FC<ProductSectionProps> = ({
                   isFavorited={favoritedIds.includes(product.id)}
                   onToggleFavorite={onToggleFavorite}
                   onToast={onToast}
+                  activeTheme={activeTheme}
                 />
               </div>
             ))}
@@ -145,7 +162,11 @@ export const ProductSection: React.FC<ProductSectionProps> = ({
               setIsExpanded(true);
               onToast('Mở tủ đồ chữa lành đầy đủ bộ lọc 🌿', 'info');
             }}
-            className="group inline-flex items-center gap-2 px-7 py-4 rounded-full bg-cozy-wood text-cozy-ivory hover:bg-cozy-moss text-xs sm:text-sm font-bold uppercase tracking-wider transition-all duration-500 cursor-pointer shadow-lg shadow-cozy-wood/20 hover:shadow-cozy-moss/20 animate-bounce-slow"
+            className={`group inline-flex items-center gap-2 px-7 py-4 rounded-full text-xs sm:text-sm font-bold uppercase tracking-wider transition-all duration-500 cursor-pointer shadow-lg ${
+              activeTheme === 'evening'
+                ? 'bg-cozy-warm-yellow hover:bg-[#F2D7A5] text-[#181310] shadow-cozy-warm-yellow/10'
+                : 'bg-cozy-wood hover:bg-cozy-moss text-cozy-ivory shadow-cozy-wood/20 hover:shadow-cozy-moss/20'
+            } animate-bounce-slow`}
           >
             <span>Khám phá thêm tủ đồ & Tìm kiếm</span>
             <motion.div
@@ -155,7 +176,9 @@ export const ProductSection: React.FC<ProductSectionProps> = ({
               <ChevronDown size={16} />
             </motion.div>
           </button>
-          <p className="text-xs text-cozy-dark/50 font-mono mt-3 tracking-tight uppercase">
+          <p className={`text-xs font-mono mt-3 tracking-tight uppercase transition-colors ${
+            activeTheme === 'evening' ? 'text-[#EBE4DC]/50' : 'text-cozy-dark/50'
+          }`}>
             Mở cửa sổ lọc danh mục, tìm kiếm vật phẩm chính hãng
           </p>
         </div>
@@ -176,28 +199,40 @@ export const ProductSection: React.FC<ProductSectionProps> = ({
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: 20 }}
                 transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-                className="relative bg-[#FFFDF8] w-full max-w-6xl rounded-3xl shadow-2xl border border-cozy-wood/10 flex flex-col max-h-[90vh] md:max-h-[85vh] overflow-hidden bg-grain"
+                className={`relative w-full max-w-6xl rounded-3xl shadow-2xl flex flex-col max-h-[90vh] md:max-h-[85vh] overflow-hidden bg-grain transition-colors duration-500 ${
+                  activeTheme === 'evening'
+                    ? 'bg-[#1C1713] border border-[#5A483B]/40 text-[#EBE4DC]'
+                    : 'bg-[#FFFDF8] border border-cozy-wood/10 text-cozy-dark'
+                }`}
                 onClick={(e) => e.stopPropagation()} // Prevent close on modal content click
               >
                 
                 {/* Modal Header */}
-                <div className="px-6 py-5 md:px-8 md:py-6 border-b border-cozy-wood/5 flex flex-col gap-4 relative">
+                <div className={`px-6 py-5 md:px-8 md:py-6 border-b flex flex-col gap-4 relative transition-colors ${
+                  activeTheme === 'evening' ? 'border-[#5A483B]/20' : 'border-cozy-wood/5'
+                }`}>
                   
                   {/* Close button inside modal */}
                   <button
                     onClick={() => setIsExpanded(false)}
-                    className="absolute top-4 right-4 sm:top-5 sm:right-5 p-2 rounded-full hover:bg-cozy-cream/40 text-cozy-dark/60 hover:text-cozy-dark transition-all duration-300 cursor-pointer"
+                    className={`absolute top-4 right-4 sm:top-5 sm:right-5 p-2 rounded-full transition-all duration-300 cursor-pointer ${
+                      activeTheme === 'evening' ? 'hover:bg-[#2D231D] text-[#EBE4DC]/65 hover:text-[#EBE4DC]' : 'hover:bg-cozy-cream/40 text-cozy-dark/60 hover:text-cozy-dark'
+                    }`}
                     title="Đóng cửa sổ"
                   >
                     <X size={18} />
                   </button>
 
                   <div className="pr-12">
-                    <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-cozy-moss flex items-center gap-1">
+                    <span className={`text-[9px] font-bold uppercase tracking-[0.2em] flex items-center gap-1 transition-colors ${
+                      activeTheme === 'evening' ? 'text-cozy-warm-yellow' : 'text-cozy-moss'
+                    }`}>
                       <Sparkles size={10} className="text-cozy-warm-yellow fill-cozy-warm-yellow animate-spin-slow" />
                       KHÁM PHÁ TOÀN BỘ TỦ ĐỒ CHỮA LÀNH
                     </span>
-                    <h3 className="font-serif text-lg sm:text-xl font-semibold text-cozy-dark leading-tight mt-1">
+                    <h3 className={`font-serif text-lg sm:text-xl font-semibold leading-tight mt-1 transition-colors ${
+                      activeTheme === 'evening' ? 'text-[#EBE4DC]' : 'text-cozy-dark'
+                    }`}>
                       Mảnh ghép không gian yên lành
                     </h3>
                   </div>
@@ -207,7 +242,9 @@ export const ProductSection: React.FC<ProductSectionProps> = ({
                     
                     {/* Category tabs */}
                     <div className="md:col-span-6 space-y-1.5">
-                      <span className="text-[9px] font-mono text-cozy-dark/45 uppercase tracking-wider block pl-1">Phân loại sản phẩm</span>
+                      <span className={`text-[9px] font-mono uppercase tracking-wider block pl-1 transition-colors ${
+                        activeTheme === 'evening' ? 'text-[#EBE4DC]/50' : 'text-cozy-dark/45'
+                      }`}>Phân loại sản phẩm</span>
                       <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-none">
                         {categories.map((cat) => (
                           <button
@@ -215,8 +252,12 @@ export const ProductSection: React.FC<ProductSectionProps> = ({
                             onClick={() => setSelectedCategory(cat)}
                             className={`px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all duration-300 cursor-pointer shrink-0 ${
                               selectedCategory === cat
-                                ? 'bg-cozy-wood text-cozy-ivory shadow-md'
-                                : 'bg-[#FFFDF8] border border-cozy-wood/10 text-cozy-dark/70 hover:bg-cozy-cream/50'
+                                ? activeTheme === 'evening'
+                                  ? 'bg-cozy-warm-yellow text-[#181310] shadow-md'
+                                  : 'bg-cozy-wood text-cozy-ivory shadow-md'
+                                : activeTheme === 'evening'
+                                  ? 'bg-[#241D19] border border-[#5A483B]/40 text-[#EBE4DC]/70 hover:bg-[#2D231D]'
+                                  : 'bg-[#FFFDF8] border border-cozy-wood/10 text-cozy-dark/70 hover:bg-cozy-cream/50'
                             }`}
                           >
                             {cat}
@@ -227,20 +268,30 @@ export const ProductSection: React.FC<ProductSectionProps> = ({
 
                     {/* Search box */}
                     <div className="md:col-span-3 space-y-1.5">
-                      <span className="text-[9px] font-mono text-cozy-dark/45 uppercase tracking-wider block pl-1">Tìm kiếm vật phẩm</span>
+                      <span className={`text-[9px] font-mono uppercase tracking-wider block pl-1 transition-colors ${
+                        activeTheme === 'evening' ? 'text-[#EBE4DC]/50' : 'text-cozy-dark/45'
+                      }`}>Tìm kiếm vật phẩm</span>
                       <div className="relative">
                         <input
                           type="text"
                           value={searchQuery}
                           onChange={(e) => setSearchQuery(e.target.value)}
                           placeholder="Tìm đèn, loa, nến thơm..."
-                          className="w-full bg-[#FFFDF8] border border-cozy-wood/15 rounded-full px-3.5 py-1.5 pl-8 text-[11px] text-cozy-dark placeholder:text-cozy-dark/35 focus:outline-none focus:border-cozy-wood font-sans transition-colors"
+                          className={`w-full rounded-full px-3.5 py-1.5 pl-8 text-[11px] focus:outline-none font-sans transition-colors ${
+                            activeTheme === 'evening'
+                              ? 'bg-[#241D19] border border-[#5A483B]/40 text-[#EBE4DC] placeholder:text-[#EBE4DC]/30 focus:border-cozy-warm-yellow/60'
+                              : 'bg-[#FFFDF8] border border-cozy-wood/15 text-cozy-dark placeholder:text-cozy-dark/35 focus:border-cozy-wood'
+                          }`}
                         />
-                        <Search size={11} className="absolute left-3 top-1/2 -translate-y-1/2 text-cozy-dark/40" />
+                        <Search size={11} className={`absolute left-3 top-1/2 -translate-y-1/2 ${
+                          activeTheme === 'evening' ? 'text-[#EBE4DC]/40' : 'text-cozy-dark/40'
+                        }`} />
                         {searchQuery && (
                           <button
                             onClick={() => setSearchQuery('')}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-cozy-dark/40 hover:text-cozy-dark text-xs cursor-pointer font-bold"
+                            className={`absolute right-3 top-1/2 -translate-y-1/2 text-xs cursor-pointer font-bold ${
+                              activeTheme === 'evening' ? 'text-[#EBE4DC]/50 hover:text-[#EBE4DC]' : 'text-cozy-dark/40 hover:text-cozy-dark'
+                            }`}
                           >
                             &times;
                           </button>
@@ -250,23 +301,37 @@ export const ProductSection: React.FC<ProductSectionProps> = ({
 
                     {/* Active mood filters */}
                     <div className="md:col-span-3 space-y-1.5">
-                      <span className="text-[9px] font-mono text-cozy-dark/45 uppercase tracking-wider block pl-1">Trạng thái tâm lý</span>
+                      <span className={`text-[9px] font-mono uppercase tracking-wider block pl-1 transition-colors ${
+                        activeTheme === 'evening' ? 'text-[#EBE4DC]/50' : 'text-cozy-dark/45'
+                      }`}>Trạng thái tâm lý</span>
                       <div className="min-h-[30px] flex items-center justify-end">
                         {selectedMoodId ? (
-                          <div className="flex items-center justify-between w-full bg-cozy-wood/5 border border-cozy-wood/10 rounded-full px-3 py-1.5 text-[10px]">
-                            <span className="text-cozy-dark/75 truncate">
-                              Gợi ý: <strong className="text-cozy-wood font-serif italic">{activeMood?.name}</strong>
+                          <div className={`flex items-center justify-between w-full border rounded-full px-3 py-1.5 text-[10px] ${
+                            activeTheme === 'evening'
+                              ? 'bg-[#241D19] border-[#5A483B]/40 text-[#EBE4DC]/80'
+                              : 'bg-cozy-wood/5 border border-cozy-wood/10 text-cozy-dark/75'
+                          }`}>
+                            <span className="truncate">
+                              Gợi ý: <strong className={`font-serif italic ${
+                                activeTheme === 'evening' ? 'text-cozy-warm-yellow' : 'text-cozy-wood'
+                              }`}>{activeMood?.name}</strong>
                             </span>
                             <button
                               onClick={onClearMoodFilter}
-                              className="w-3.5 h-3.5 rounded-full bg-cozy-wood/10 hover:bg-cozy-wood hover:text-cozy-ivory flex items-center justify-center text-cozy-dark text-[8px] cursor-pointer transition-all duration-200 ml-1.5 shrink-0"
+                              className={`w-3.5 h-3.5 rounded-full flex items-center justify-center text-[8px] cursor-pointer transition-all duration-200 ml-1.5 shrink-0 ${
+                                activeTheme === 'evening'
+                                  ? 'bg-[#1C1713] hover:bg-cozy-warm-yellow text-cozy-warm-yellow hover:text-[#181310]'
+                                  : 'bg-cozy-wood/10 hover:bg-cozy-wood hover:text-cozy-ivory text-cozy-dark'
+                              }`}
                               title="Xóa bộ lọc tâm trạng"
                             >
                               &times;
                             </button>
                           </div>
                         ) : (
-                          <span className="text-[9px] text-cozy-dark/40 italic leading-tight font-sans pl-1 w-full text-left md:text-right">
+                          <span className={`text-[9px] italic leading-tight font-sans pl-1 w-full text-left md:text-right ${
+                            activeTheme === 'evening' ? 'text-[#EBE4DC]/40' : 'text-cozy-dark/40'
+                          }`}>
                             Đồng bộ với Mood góc trên
                           </span>
                         )}
@@ -282,11 +347,17 @@ export const ProductSection: React.FC<ProductSectionProps> = ({
                   {filteredProducts.length === 0 ? (
                     /* Empty filtered state inside modal */
                     <div className="py-16 text-center">
-                      <div className="w-12 h-12 rounded-full bg-cozy-wood/5 flex items-center justify-center text-cozy-wood/30 mx-auto mb-3">
+                      <div className={`w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 ${
+                        activeTheme === 'evening' ? 'bg-[#241D19] text-[#EBE4DC]/30' : 'bg-cozy-wood/5 text-cozy-wood/30'
+                      }`}>
                         <EyeOff size={20} />
                       </div>
-                      <h4 className="font-serif text-sm font-semibold text-cozy-dark">Không tìm thấy món đồ phù hợp</h4>
-                      <p className="text-[11px] text-cozy-dark/60 max-w-xs mx-auto leading-relaxed mt-1 font-sans">
+                      <h4 className={`font-serif text-sm font-semibold transition-colors ${
+                        activeTheme === 'evening' ? 'text-[#EBE4DC]' : 'text-cozy-dark'
+                      }`}>Không tìm thấy món đồ phù hợp</h4>
+                      <p className={`text-[11px] max-w-xs mx-auto leading-relaxed mt-1 font-sans transition-colors ${
+                        activeTheme === 'evening' ? 'text-[#EBE4DC]/60' : 'text-cozy-dark/60'
+                      }`}>
                         Không tìm thấy mảnh ghép nào khớp với bộ lọc hoặc từ khóa "{searchQuery}". Bạn hãy thử reset lại nhé.
                       </p>
                       <button
@@ -295,14 +366,20 @@ export const ProductSection: React.FC<ProductSectionProps> = ({
                           setSearchQuery('');
                           onClearMoodFilter();
                         }}
-                        className="mt-4 px-4 py-1.5 rounded-full bg-cozy-wood text-cozy-ivory text-[9px] font-bold uppercase tracking-wider hover:bg-cozy-moss transition-colors cursor-pointer shadow-sm"
+                        className={`mt-4 px-4 py-1.5 rounded-full text-[9px] font-bold uppercase tracking-wider transition-colors cursor-pointer shadow-sm ${
+                          activeTheme === 'evening'
+                            ? 'bg-cozy-warm-yellow text-[#181310] hover:bg-cozy-warm-yellow/90'
+                            : 'bg-cozy-wood text-cozy-ivory hover:bg-cozy-moss'
+                        }`}
                       >
                         Đặt lại toàn bộ lọc
                       </button>
                     </div>
                   ) : (
                     <div className="space-y-4">
-                      <p className="text-[10px] font-mono text-cozy-dark/40 uppercase tracking-wider pl-1">
+                      <p className={`text-[10px] font-mono uppercase tracking-wider pl-1 transition-colors ${
+                        activeTheme === 'evening' ? 'text-[#EBE4DC]/40' : 'text-cozy-dark/40'
+                      }`}>
                         Hiện có {filteredProducts.length} mảnh ghép được tuyển chọn tỉ mẩn:
                       </p>
                       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8">
@@ -313,6 +390,7 @@ export const ProductSection: React.FC<ProductSectionProps> = ({
                               isFavorited={favoritedIds.includes(product.id)}
                               onToggleFavorite={onToggleFavorite}
                               onToast={onToast}
+                              activeTheme={activeTheme}
                             />
                           </div>
                         ))}
@@ -322,13 +400,23 @@ export const ProductSection: React.FC<ProductSectionProps> = ({
                 </div>
 
                 {/* Modal Footer */}
-                <div className="px-6 py-4 border-t border-cozy-wood/5 bg-cozy-cream/20 text-center flex items-center justify-between">
-                  <p className="text-[9px] text-cozy-dark/30 font-mono tracking-tight uppercase text-left">
+                <div className={`px-6 py-4 border-t text-center flex items-center justify-between transition-colors ${
+                  activeTheme === 'evening'
+                    ? 'border-[#5A483B]/20 bg-[#241D19]/40'
+                    : 'border-cozy-wood/5 bg-cozy-cream/20'
+                }`}>
+                  <p className={`text-[9px] font-mono tracking-tight uppercase text-left transition-colors ${
+                    activeTheme === 'evening' ? 'text-[#EBE4DC]/30' : 'text-cozy-dark/30'
+                  }`}>
                     * Nhấn phím ESC hoặc click bên ngoài để đóng lại bất kỳ lúc nào
                   </p>
                   <button
                     onClick={() => setIsExpanded(false)}
-                    className="px-4 py-1.5 rounded-full bg-cozy-wood/10 hover:bg-cozy-wood text-cozy-dark hover:text-cozy-ivory text-[10px] font-bold uppercase tracking-wider transition-all duration-300 cursor-pointer"
+                    className={`px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all duration-300 cursor-pointer ${
+                      activeTheme === 'evening'
+                        ? 'bg-[#241D19] hover:bg-cozy-warm-yellow text-[#EBE4DC] hover:text-[#181310] border border-[#5A483B]/40'
+                        : 'bg-cozy-wood/10 hover:bg-cozy-wood text-cozy-dark hover:text-cozy-ivory'
+                    }`}
                   >
                     Đóng cửa sổ
                   </button>
@@ -340,8 +428,12 @@ export const ProductSection: React.FC<ProductSectionProps> = ({
         </AnimatePresence>
 
         {/* Bottom transparent disclosure tag styled like an editorial footnote */}
-        <div className="text-center pt-8 border-t border-cozy-wood/10">
-          <p className="text-xs text-cozy-dark/60 font-mono tracking-tight max-w-xl mx-auto leading-relaxed uppercase">
+        <div className={`text-center pt-8 border-t transition-colors ${
+          activeTheme === 'evening' ? 'border-[#5A483B]/20' : 'border-cozy-wood/10'
+        }`}>
+          <p className={`text-xs font-mono tracking-tight max-w-xl mx-auto leading-relaxed uppercase transition-colors ${
+            activeTheme === 'evening' ? 'text-[#EBE4DC]/50' : 'text-cozy-dark/60'
+          }`}>
             * Mỗi vật phẩm đều đã được giám định thực tế và liên kết đến các nhà cung cấp uy tín trên TikTok Shop. Tan Ca Rồi hỗ trợ chuyển giao phi lợi nhuận.
           </p>
         </div>

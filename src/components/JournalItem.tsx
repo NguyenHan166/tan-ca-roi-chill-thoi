@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
-import { Journal } from '../types';
+import { Journal, TimeTheme } from '../types';
 import { Play, BookOpen, Clock, X, Calendar, Sparkles, Heart } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface JournalItemProps {
   journal: Journal;
   onToast: (msg: string, type: 'info' | 'success' | 'heart' | 'error') => void;
+  activeTheme?: TimeTheme;
 }
 
-export const JournalItem: React.FC<JournalItemProps> = ({ journal, onToast }) => {
+export const JournalItem: React.FC<JournalItemProps> = ({ journal, onToast, activeTheme = 'morning' }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
 
@@ -29,7 +30,11 @@ export const JournalItem: React.FC<JournalItemProps> = ({ journal, onToast }) =>
     <>
       <article
         onClick={handleOpen}
-        className={`bg-[#FFFDF8] border border-cozy-wood/5 rounded-[32px] overflow-hidden hover:shadow-2xl hover:shadow-cozy-wood/5 transition-cozy group cursor-pointer flex flex-col h-full ${
+        className={`border rounded-[32px] overflow-hidden hover:shadow-2xl transition-all duration-500 group cursor-pointer flex flex-col h-full ${
+          activeTheme === 'evening'
+            ? 'bg-[#1C1713] border-[#5A483B]/40 hover:shadow-cozy-warm-yellow/5'
+            : 'bg-[#FFFDF8] border-cozy-wood/5 hover:shadow-cozy-wood/5'
+        } ${
           journal.featured ? 'md:col-span-2 md:flex-row' : ''
         }`}
         id={`journal-card-${journal.id}`}
@@ -73,7 +78,9 @@ export const JournalItem: React.FC<JournalItemProps> = ({ journal, onToast }) =>
           )}
 
           {/* Post Type Badge */}
-          <span className={`absolute top-4 left-4 inline-flex items-center gap-1 px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider bg-cozy-wood/90 text-[#FFFDF8]`}>
+          <span className={`absolute top-4 left-4 inline-flex items-center gap-1 px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider ${
+            activeTheme === 'evening' ? 'bg-cozy-warm-yellow text-[#181310]' : 'bg-cozy-wood/90 text-[#FFFDF8]'
+          }`}>
             Câu chuyện chữa lành
           </span>
         </div>
@@ -83,29 +90,41 @@ export const JournalItem: React.FC<JournalItemProps> = ({ journal, onToast }) =>
           journal.featured ? 'md:w-1/2' : ''
         }`}>
           <div className="space-y-4">
-            <div className="flex items-center gap-1.5 text-cozy-dark/65 text-xs uppercase tracking-[0.1em] font-bold">
+            <div className={`flex items-center gap-1.5 text-xs uppercase tracking-[0.1em] font-bold transition-colors ${
+              activeTheme === 'evening' ? 'text-[#EBE4DC]/50' : 'text-cozy-dark/65'
+            }`}>
               <Calendar size={13} />
               <span>{journal.date}</span>
             </div>
 
-            <h4 className="font-serif text-2xl font-bold italic text-cozy-dark leading-snug group-hover:text-cozy-wood transition-colors">
+            <h4 className={`font-serif text-2xl font-bold italic leading-snug transition-colors ${
+              activeTheme === 'evening' ? 'text-[#EBE4DC] group-hover:text-cozy-warm-yellow' : 'text-cozy-dark group-hover:text-cozy-wood'
+            }`}>
               {journal.title}
             </h4>
 
-            <p className="text-sm sm:text-base text-cozy-dark/80 leading-relaxed line-clamp-3 font-sans">
+            <p className={`text-sm sm:text-base leading-relaxed font-sans transition-colors ${
+              activeTheme === 'evening' ? 'text-[#EBE4DC]/80' : 'text-cozy-dark/80'
+            }`}>
               {journal.excerpt}
             </p>
           </div>
 
-          <div className="pt-6 border-t border-cozy-wood/10 flex items-center justify-between mt-6">
-            <span className="text-sm font-bold text-cozy-wood group-hover:text-cozy-moss transition-colors flex items-center gap-1">
+          <div className={`pt-6 border-t flex items-center justify-between mt-6 ${
+            activeTheme === 'evening' ? 'border-[#5A483B]/20' : 'border-cozy-wood/10'
+          }`}>
+            <span className={`text-sm font-bold transition-colors flex items-center gap-1 ${
+              activeTheme === 'evening' ? 'text-cozy-warm-yellow group-hover:text-[#F2D7A5]' : 'text-cozy-wood group-hover:text-cozy-moss'
+            }`}>
               Đọc câu chuyện &rarr;
             </span>
 
             {/* Tiny interaction buttons */}
             <button
               onClick={handleLike}
-              className="text-cozy-dark/60 hover:text-red-500 transition-colors cursor-pointer flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider"
+              className={`transition-colors cursor-pointer flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider ${
+                activeTheme === 'evening' ? 'text-[#EBE4DC]/60 hover:text-red-400' : 'text-cozy-dark/60 hover:text-red-500'
+              }`}
               aria-label="Thả tim bài viết"
             >
               <Heart size={15} className={isLiked ? 'text-red-500 fill-red-500' : ''} />
@@ -134,19 +153,31 @@ export const JournalItem: React.FC<JournalItemProps> = ({ journal, onToast }) =>
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.98, y: 20 }}
               transition={{ type: 'spring', damping: 28 }}
-              className="relative bg-[#FFFDF8] border border-cozy-wood/5 rounded-[32px] max-w-2xl w-full max-h-[85vh] overflow-y-auto shadow-2xl z-10 flex flex-col"
+              className={`relative border rounded-[32px] max-w-2xl w-full max-h-[85vh] overflow-y-auto shadow-2xl z-10 flex flex-col transition-colors duration-500 ${
+                activeTheme === 'evening'
+                  ? 'bg-[#1C1713] border-[#5A483B]/40 text-[#EBE4DC]'
+                  : 'bg-[#FFFDF8] border-cozy-wood/5 text-cozy-dark'
+              }`}
               role="dialog"
               aria-modal="true"
             >
               {/* Sticky Close Header */}
-              <div className="sticky top-0 bg-[#FFFDF8]/95 backdrop-blur-md px-6 py-4 border-b border-cozy-wood/10 flex items-center justify-between z-10">
-                <span className="text-xs sm:text-sm uppercase tracking-widest text-cozy-moss font-bold flex items-center gap-1.5">
+              <div className={`sticky top-0 px-6 py-4 border-b flex items-center justify-between z-10 transition-colors ${
+                activeTheme === 'evening'
+                  ? 'bg-[#1C1713]/95 backdrop-blur-md border-[#5A483B]/20'
+                  : 'bg-[#FFFDF8]/95 backdrop-blur-md border-cozy-wood/10'
+              }`}>
+                <span className={`text-xs sm:text-sm uppercase tracking-widest font-bold flex items-center gap-1.5 ${
+                  activeTheme === 'evening' ? 'text-cozy-warm-yellow' : 'text-cozy-moss'
+                }`}>
                   <Sparkles size={13} className="text-cozy-warm-yellow fill-cozy-warm-yellow animate-spin" />
                   Góc Đọc Trải Nghiệm Chữa Lành
                 </span>
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="w-8 h-8 rounded-full hover:bg-cozy-wood/5 flex items-center justify-center text-cozy-dark cursor-pointer"
+                  className={`w-8 h-8 rounded-full flex items-center justify-center cursor-pointer transition-colors ${
+                    activeTheme === 'evening' ? 'hover:bg-[#2D231D] text-[#EBE4DC]' : 'hover:bg-cozy-wood/5 text-cozy-dark'
+                  }`}
                   aria-label="Đóng bài viết"
                 >
                   <X size={18} />
@@ -166,21 +197,29 @@ export const JournalItem: React.FC<JournalItemProps> = ({ journal, onToast }) =>
 
                 {/* Typography and Reading layout */}
                 <div className="space-y-4">
-                  <div className="flex items-center gap-3 text-cozy-dark/70 text-sm font-semibold">
+                  <div className={`flex items-center gap-3 text-sm font-semibold transition-colors ${
+                    activeTheme === 'evening' ? 'text-[#EBE4DC]/70' : 'text-cozy-dark/70'
+                  }`}>
                     <Calendar size={14} />
                     <span>{journal.date}</span>
                     <span>•</span>
                     <span>Bởi Tan Ca Rồi Team</span>
                   </div>
 
-                  <h3 className="font-serif text-3xl font-bold italic text-cozy-dark leading-snug">
+                  <h3 className={`font-serif text-3xl font-bold italic leading-snug transition-colors ${
+                    activeTheme === 'evening' ? 'text-[#EBE4DC]' : 'text-cozy-dark'
+                  }`}>
                     {journal.title}
                   </h3>
 
-                  <div className="h-px bg-cozy-wood/15" />
+                  <div className={`h-px ${
+                    activeTheme === 'evening' ? 'bg-[#5A483B]/20' : 'bg-cozy-wood/15'
+                  }`} />
 
                   {/* Body text paragraphs */}
-                  <div className="font-editorial text-base md:text-lg text-cozy-dark/95 space-y-5 leading-relaxed whitespace-pre-line text-justify font-serif">
+                  <div className={`font-editorial text-base md:text-lg space-y-5 leading-relaxed whitespace-pre-line text-justify font-serif transition-colors ${
+                    activeTheme === 'evening' ? 'text-[#EBE4DC]/95' : 'text-cozy-dark/95'
+                  }`}>
                     {journal.content && journal.content.length > 0 ? (
                       journal.content.map((paragraph, idx) => (
                         <p key={idx}>{paragraph}</p>
@@ -196,7 +235,9 @@ export const JournalItem: React.FC<JournalItemProps> = ({ journal, onToast }) =>
                         <p>
                           Chúng mình tạo dựng nên góc nhỏ <strong>“Tan Ca Rồi”</strong> với hy vọng mang lại cho bạn một nơi nương náu yên lành sau những ngày mệt mỏi rã rời ngoài kia. Tại đây không có những thanh âm hối hả của cuộc gọi nhỡ, không có tiếng chuông thông báo giục giã công việc. Chỉ có tiếng mưa rơi rào rạc bên bậu cửa sổ gỗ, một tách trà nhâm nhi ấm sực, và vài món đồ trang trí đơn sơ giúp ngày của bạn kết thúc theo cách trọn vẹn nhất có thể.
                         </p>
-                        <p className="italic text-cozy-moss pt-2">
+                        <p className={`italic pt-2 ${
+                          activeTheme === 'evening' ? 'text-cozy-warm-yellow' : 'text-cozy-moss'
+                        }`}>
                           “Hôm nay mệt rồi, mình nghỉ một chút thôi. Ngày mai chúng mình lại bước tiếp vững vàng nhé.”
                         </p>
                       </>
@@ -205,12 +246,18 @@ export const JournalItem: React.FC<JournalItemProps> = ({ journal, onToast }) =>
                 </div>
 
                 {/* Footer Interaction */}
-                <div className="pt-6 border-t border-cozy-wood/5 flex items-center justify-between">
+                <div className={`pt-6 border-t flex items-center justify-between ${
+                  activeTheme === 'evening' ? 'border-[#5A483B]/20' : 'border-cozy-wood/5'
+                }`}>
                   <button
                     onClick={handleLike}
-                    className="flex items-center gap-2 px-4 py-2 rounded-full border border-cozy-wood/10 hover:border-red-200 hover:bg-red-50/30 text-cozy-dark transition-all cursor-pointer text-xs font-medium"
+                    className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-all cursor-pointer text-xs font-medium ${
+                      activeTheme === 'evening'
+                        ? 'border-[#5A483B]/40 hover:border-red-400 hover:bg-red-950/20 text-[#EBE4DC]'
+                        : 'border-cozy-wood/10 hover:border-red-200 hover:bg-red-50/30 text-cozy-dark'
+                    }`}
                   >
-                    <Heart size={14} className={isLiked ? 'text-red-500 fill-red-500' : 'text-cozy-dark/50'} />
+                    <Heart size={14} className={isLiked ? 'text-red-500 fill-red-500' : activeTheme === 'evening' ? 'text-[#EBE4DC]/50' : 'text-cozy-dark/50'} />
                     <span>{isLiked ? 'Cảm ơn bạn đã thả tim!' : 'Thả tim bài viết'}</span>
                   </button>
 
@@ -218,7 +265,9 @@ export const JournalItem: React.FC<JournalItemProps> = ({ journal, onToast }) =>
                     href={journal.mediaUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-xs text-cozy-wood hover:text-cozy-moss font-semibold underline"
+                    className={`inline-flex items-center gap-1 text-xs font-semibold underline ${
+                      activeTheme === 'evening' ? 'text-cozy-warm-yellow hover:text-[#F2D7A5]' : 'text-cozy-wood hover:text-cozy-moss'
+                    }`}
                   >
                     Ghé thăm Tan Ca Rồi &rarr;
                   </a>

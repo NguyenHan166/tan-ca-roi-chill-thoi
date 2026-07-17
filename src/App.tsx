@@ -50,6 +50,17 @@ export default function App() {
     setFavoritedIds(getFavorites());
   }, []);
 
+  // Ambient sound auto-transition when theme changes
+  useEffect(() => {
+    if (activeTheme === 'morning') {
+      setActiveTrackId('nature');
+    } else if (activeTheme === 'afternoon') {
+      setActiveTrackId('cafe');
+    } else if (activeTheme === 'evening') {
+      setActiveTrackId('rain');
+    }
+  }, [activeTheme]);
+
   // Show Toast helper
   const addToast = (message: string, type: ToastMessage['type'] = 'info') => {
     // No-op: Disable all notifications/toasts as requested
@@ -106,18 +117,18 @@ export default function App() {
   const getThemeWrapperClass = () => {
     switch (activeTheme) {
       case 'morning':
-        return 'bg-[#FFFDF8] text-[#302922] transition-colors duration-1000';
+        return 'bg-[#FFFDF6] text-[#3A332B] transition-all duration-[1200ms]';
       case 'afternoon':
-        return 'bg-[#FAF5ED] text-[#302922] transition-colors duration-1000';
+        return 'bg-[#FAF2E5] text-[#3E342B] transition-all duration-[1200ms]';
       case 'evening':
-        return 'bg-[#F4EFE7] text-[#302922] transition-colors duration-1000';
+        return 'bg-[#181310] text-[#EBE4DC] transition-all duration-[1200ms]';
       default:
-        return 'bg-[#F4EFE7] text-[#302922]';
+        return 'bg-[#181310] text-[#EBE4DC]';
     }
   };
 
   return (
-    <div className={`min-h-screen antialiased flex flex-col font-sans ${getThemeWrapperClass()}`}>
+    <div className={`min-h-screen antialiased flex flex-col font-sans transition-all duration-[1200ms] ${getThemeWrapperClass()}`}>
       
       {/* 1. Sticky Navigation Header */}
       <Header
@@ -143,7 +154,7 @@ export default function App() {
         />
 
         {/* Emotional Greeting */}
-        <GreetingSection />
+        <GreetingSection activeTheme={activeTheme} />
 
         {/* Interactive Mood Selector */}
         <MoodSection
@@ -154,7 +165,7 @@ export default function App() {
 
         {/* Interactive Workspace Photo Showcase */}
         <section className="py-24 px-4 md:px-8 border-b border-cozy-wood/5 max-w-7xl mx-auto w-full" id="cozy-desk">
-          <MyDeskShowcase onToast={addToast} />
+          <MyDeskShowcase activeTheme={activeTheme} onToast={addToast} />
         </section>
 
         {/* Curated Products Affiliate Showcase Grid */}
@@ -164,23 +175,26 @@ export default function App() {
           favoritedIds={favoritedIds}
           onToggleFavorite={handleToggleFavorite}
           onToast={addToast}
+          activeTheme={activeTheme}
         />
 
         {/* Cinematic Parallax Quote Divider */}
         <ParallaxQuoteSection />
 
         {/* Editorial Stories & Video Diaries */}
-        <JournalSection onToast={addToast} />
+        <JournalSection activeTheme={activeTheme} onToast={addToast} />
 
         {/* Atmospheric Weather Forecast Widget */}
-        <section className="py-28 px-4 md:px-8 bg-cozy-cream/15 border-b border-cozy-wood/5 relative bg-grain" id="cozy-weather">
+        <section className={`py-28 px-4 md:px-8 border-b border-cozy-wood/5 relative bg-grain transition-colors duration-[1200ms] ${
+          activeTheme === 'evening' ? 'bg-[#221A16]/40' : 'bg-cozy-cream/15'
+        }`} id="cozy-weather">
           <div className="max-w-7xl mx-auto w-full">
-            <WeatherCozy onToast={addToast} />
+            <WeatherCozy activeTheme={activeTheme} onToast={addToast} />
           </div>
         </section>
 
         {/* Newsletter subscription box */}
-        <NewsletterSection onToast={addToast} />
+        <NewsletterSection onToast={addToast} activeTheme={activeTheme} />
       </main>
 
       {/* 3. Global Footer with Transparency Disclosures */}

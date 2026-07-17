@@ -17,9 +17,11 @@ import {
   Flame,
   Lightbulb
 } from 'lucide-react';
+import { TimeTheme } from '../types';
 
 interface WeatherCozyProps {
   onToast: (msg: string, type: 'info' | 'success' | 'heart' | 'error') => void;
+  activeTheme?: TimeTheme;
 }
 
 interface CityWeather {
@@ -98,10 +100,24 @@ const citiesData: CityWeather[] = [
   }
 ];
 
-export const WeatherCozy: React.FC<WeatherCozyProps> = ({ onToast }) => {
+export const WeatherCozy: React.FC<WeatherCozyProps> = ({ activeTheme, onToast }) => {
   const [activeCityIdx, setActiveCityIdx] = useState(0);
   const [isHeaterOn, setIsHeaterOn] = useState(false);
   const [localTemp, setLocalTemp] = useState(citiesData[0].temp);
+
+  // Sync city selection based on theme for automatic experience pairing!
+  useEffect(() => {
+    if (activeTheme === 'morning') {
+      setActiveCityIdx(2); // Đà Lạt - Sương mù bảng lảng sớm mai
+      setIsHeaterOn(false);
+    } else if (activeTheme === 'afternoon') {
+      setActiveCityIdx(3); // Đà Nẵng - Hoàng hôn lộng gió
+      setIsHeaterOn(false);
+    } else if (activeTheme === 'evening') {
+      setActiveCityIdx(4); // Sa Pa - Mưa phùn sương đêm bên bếp hồng
+      setIsHeaterOn(false);
+    }
+  }, [activeTheme]);
 
   const activeCity = citiesData[activeCityIdx];
 
@@ -148,18 +164,28 @@ export const WeatherCozy: React.FC<WeatherCozyProps> = ({ onToast }) => {
   };
 
   return (
-    <div className="w-full bg-[#FFFDF8] border border-cozy-wood/15 rounded-3xl p-6 md:p-10 flex flex-col gap-8 shadow-md relative overflow-hidden bg-grain">
+    <div className={`w-full border rounded-3xl p-6 md:p-10 flex flex-col gap-8 shadow-md relative overflow-hidden bg-grain transition-all duration-[1200ms] ${
+      activeTheme === 'evening'
+        ? 'bg-[#241D19]/60 border-[#5A483B]/40 text-[#EBE4DC]'
+        : 'bg-cozy-ivory border-cozy-wood/15 text-cozy-dark'
+    }`}>
       
       {/* Decorative top title */}
       <div className="text-center max-w-xl mx-auto space-y-3">
-        <span className="text-xs sm:text-sm font-bold text-cozy-moss uppercase tracking-widest flex items-center justify-center gap-1.5">
+        <span className={`text-xs sm:text-sm font-bold uppercase tracking-widest flex items-center justify-center gap-1.5 transition-colors ${
+          activeTheme === 'evening' ? 'text-cozy-warm-yellow' : 'text-cozy-moss'
+        }`}>
           <Sparkles size={14} className="text-cozy-warm-yellow fill-cozy-warm-yellow" />
           DỰ BÁO HOÀNG HÔN BÌNH YÊN
         </span>
-        <h3 className="font-serif text-3xl md:text-4xl font-semibold text-cozy-dark">
+        <h3 className={`font-serif text-3xl md:text-4xl font-semibold transition-colors ${
+          activeTheme === 'evening' ? 'text-[#EBE4DC]' : 'text-cozy-dark'
+        }`}>
           Hôm nay thời tiết thế nào?
         </h3>
-        <p className="text-sm md:text-base text-cozy-dark/85 leading-relaxed font-sans max-w-lg mx-auto">
+        <p className={`text-sm md:text-base leading-relaxed font-sans max-w-lg mx-auto transition-colors ${
+          activeTheme === 'evening' ? 'text-[#EBE4DC]/80' : 'text-cozy-dark/85'
+        }`}>
           Nhìn ra ngoài khung cửa sổ gỗ sồi, thời tiết đang thì thầm nhắn nhủ điều gì? Chọn một nơi chốn để vỗ về nhịp thở và điều chỉnh độ ấm của căn phòng bạn nhé.
         </p>
       </div>
@@ -172,15 +198,19 @@ export const WeatherCozy: React.FC<WeatherCozyProps> = ({ onToast }) => {
             <button
               key={city.id}
               onClick={() => handleCityChange(idx)}
-              className={`px-5 py-3 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-300 flex items-center gap-2 cursor-pointer border ${
+              className={`px-5 py-3 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-500 flex items-center gap-2 cursor-pointer border ${
                 isActive
-                  ? 'bg-cozy-wood border-cozy-wood text-[#FFFDF8] shadow-md'
-                  : 'bg-cozy-cream/30 border-cozy-wood/15 text-cozy-dark hover:bg-cozy-cream/60'
+                  ? activeTheme === 'evening'
+                    ? 'bg-cozy-warm-yellow border-cozy-warm-yellow text-[#181310] shadow-md font-bold'
+                    : 'bg-cozy-wood border-cozy-wood text-[#FFFDF8] shadow-md font-bold'
+                  : activeTheme === 'evening'
+                    ? 'bg-[#1C1713] border-[#5A483B]/30 text-[#EBE4DC]/80 hover:bg-[#2D231D]'
+                    : 'bg-cozy-cream/30 border-cozy-wood/15 text-cozy-dark hover:bg-cozy-cream/60'
               }`}
             >
-              <MapPin size={13} className={isActive ? 'text-cozy-warm-yellow' : 'text-cozy-wood/60'} />
+              <MapPin size={13} className={isActive ? 'text-cozy-dark' : activeTheme === 'evening' ? 'text-cozy-warm-yellow' : 'text-cozy-wood/60'} />
               <span>{city.name}</span>
-              <span className={`text-xs font-mono opacity-90 ${isActive ? 'text-cozy-ivory/90' : 'text-cozy-wood/70'}`}>
+              <span className={`text-xs font-mono opacity-90 ${isActive ? 'text-[#181310]/90' : activeTheme === 'evening' ? 'text-cozy-warm-yellow/80' : 'text-cozy-wood/70'}`}>
                 {city.temp}°C
               </span>
             </button>
@@ -299,44 +329,82 @@ export const WeatherCozy: React.FC<WeatherCozyProps> = ({ onToast }) => {
         <div className="lg:col-span-6 flex flex-col justify-between gap-5">
           
           <div className="space-y-4">
-            <span className="text-xs sm:text-sm font-semibold text-cozy-dark/75 uppercase tracking-widest pl-1">
+            <span className={`text-xs sm:text-sm font-semibold uppercase tracking-widest pl-1 transition-colors ${
+              activeTheme === 'evening' ? 'text-cozy-warm-yellow/90' : 'text-cozy-dark/75'
+            }`}>
               Gợi ý hành trình chữa lành hôm nay:
             </span>
 
             {/* Curated Activity Item */}
-            <div className="bg-[#FFFDF8] border border-cozy-wood/15 rounded-2xl p-5 flex items-start gap-4 shadow-sm hover:border-cozy-wood/30 transition-all duration-300">
-              <div className="w-12 h-12 rounded-xl bg-cozy-cream/40 flex items-center justify-center text-cozy-moss shrink-0 border border-cozy-wood/10">
+            <div className={`border rounded-2xl p-5 flex items-start gap-4 shadow-sm transition-all duration-500 ${
+              activeTheme === 'evening'
+                ? 'bg-[#1C1713] border-[#5A483B]/40 hover:border-cozy-warm-yellow/30'
+                : 'bg-[#FFFDF8] border-cozy-wood/15 hover:border-cozy-wood/30'
+            }`}>
+              <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 border transition-colors ${
+                activeTheme === 'evening' 
+                  ? 'bg-[#2D231D] text-cozy-warm-yellow border-[#5A483B]/40' 
+                  : 'bg-cozy-cream/40 text-cozy-moss border-cozy-wood/10'
+              }`}>
                 <Coffee size={22} />
               </div>
               <div className="space-y-1">
-                <h4 className="font-serif text-base font-bold text-cozy-dark">Hoạt động vỗ về tinh thần</h4>
-                <p className="text-sm text-cozy-dark/85 leading-relaxed">
+                <h4 className={`font-serif text-base font-bold transition-colors ${
+                  activeTheme === 'evening' ? 'text-cozy-warm-yellow' : 'text-cozy-dark'
+                }`}>Hoạt động vỗ về tinh thần</h4>
+                <p className={`text-sm leading-relaxed transition-colors ${
+                  activeTheme === 'evening' ? 'text-[#EBE4DC]/80' : 'text-cozy-dark/85'
+                }`}>
                   {activeCity.activity}
                 </p>
               </div>
             </div>
 
             {/* Curated Music Item */}
-            <div className="bg-[#FFFDF8] border border-cozy-wood/15 rounded-2xl p-5 flex items-start gap-4 shadow-sm hover:border-cozy-wood/30 transition-all duration-300">
-              <div className="w-12 h-12 rounded-xl bg-cozy-cream/40 flex items-center justify-center text-cozy-moss shrink-0 border border-cozy-wood/10">
+            <div className={`border rounded-2xl p-5 flex items-start gap-4 shadow-sm transition-all duration-500 ${
+              activeTheme === 'evening'
+                ? 'bg-[#1C1713] border-[#5A483B]/40 hover:border-cozy-warm-yellow/30'
+                : 'bg-[#FFFDF8] border-cozy-wood/15 hover:border-cozy-wood/30'
+            }`}>
+              <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 border transition-colors ${
+                activeTheme === 'evening' 
+                  ? 'bg-[#2D231D] text-cozy-warm-yellow border-[#5A483B]/40' 
+                  : 'bg-cozy-cream/40 text-cozy-moss border-cozy-wood/10'
+              }`}>
                 <Music size={22} />
               </div>
               <div className="space-y-1">
-                <h4 className="font-serif text-base font-bold text-cozy-dark">Tần số âm thanh đề xuất</h4>
-                <p className="text-sm text-cozy-dark/85 leading-relaxed">
-                  Phù hợp nhất để phối hợp cùng bản <strong className="text-cozy-moss font-semibold">{activeCity.musicType}</strong> ở đài phát lofi mini góc dưới màn hình.
+                <h4 className={`font-serif text-base font-bold transition-colors ${
+                  activeTheme === 'evening' ? 'text-cozy-warm-yellow' : 'text-cozy-dark'
+                }`}>Tần số âm thanh đề xuất</h4>
+                <p className={`text-sm leading-relaxed transition-colors ${
+                  activeTheme === 'evening' ? 'text-[#EBE4DC]/80' : 'text-cozy-dark/85'
+                }`}>
+                  Phù hợp nhất để phối hợp cùng bản <strong className={activeTheme === 'evening' ? 'text-cozy-warm-yellow font-bold' : 'text-cozy-moss font-semibold'}>{activeCity.musicType}</strong> ở đài phát lofi mini góc dưới màn hình.
                 </p>
               </div>
             </div>
 
             {/* Cozy Advice Panel */}
-            <div className="bg-[#FFFDF8] border border-cozy-wood/15 rounded-2xl p-5 flex items-start gap-4 shadow-sm hover:border-cozy-wood/30 transition-all duration-300">
-              <div className="w-12 h-12 rounded-xl bg-cozy-cream/40 flex items-center justify-center text-cozy-moss shrink-0 border border-cozy-wood/10">
+            <div className={`border rounded-2xl p-5 flex items-start gap-4 shadow-sm transition-all duration-500 ${
+              activeTheme === 'evening'
+                ? 'bg-[#1C1713] border-[#5A483B]/40 hover:border-cozy-warm-yellow/30'
+                : 'bg-[#FFFDF8] border-cozy-wood/15 hover:border-cozy-wood/30'
+            }`}>
+              <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 border transition-colors ${
+                activeTheme === 'evening' 
+                  ? 'bg-[#2D231D] text-cozy-warm-yellow border-[#5A483B]/40' 
+                  : 'bg-cozy-cream/40 text-cozy-moss border-cozy-wood/10'
+              }`}>
                 <BookOpen size={22} />
               </div>
               <div className="space-y-1">
-                <h4 className="font-serif text-base font-bold text-cozy-dark">Tách lòng thư thái</h4>
-                <p className="text-sm text-cozy-dark/85 leading-relaxed text-justify font-sans">
+                <h4 className={`font-serif text-base font-bold transition-colors ${
+                  activeTheme === 'evening' ? 'text-cozy-warm-yellow' : 'text-cozy-dark'
+                }`}>Tách lòng thư thái</h4>
+                <p className={`text-sm leading-relaxed text-justify font-sans transition-colors ${
+                  activeTheme === 'evening' ? 'text-[#EBE4DC]/80' : 'text-cozy-dark/85'
+                }`}>
                   {activeCity.advice}
                 </p>
               </div>
@@ -344,11 +412,19 @@ export const WeatherCozy: React.FC<WeatherCozyProps> = ({ onToast }) => {
           </div>
 
           {/* Sincere message for mental check-in */}
-          <div className="bg-cozy-moss/5 border border-cozy-moss/15 rounded-2xl p-5 flex items-start gap-3">
-            <span className="text-cozy-moss text-lg mt-0.5">🌦️</span>
+          <div className={`border rounded-2xl p-5 flex items-start gap-3 transition-colors ${
+            activeTheme === 'evening'
+              ? 'bg-[#2D231D]/40 border-[#5A483B]/30'
+              : 'bg-cozy-moss/5 border-cozy-moss/15'
+          }`}>
+            <span className="text-lg mt-0.5 shrink-0">🌦️</span>
             <div className="space-y-1">
-              <h5 className="font-serif text-sm font-bold text-cozy-dark">Lắng nghe tiếng thở:</h5>
-              <p className="text-xs sm:text-sm text-cozy-dark/85 leading-relaxed font-sans">
+              <h5 className={`font-serif text-sm font-bold transition-colors ${
+                activeTheme === 'evening' ? 'text-[#EBE4DC]' : 'text-cozy-dark'
+              }`}>Lắng nghe tiếng thở:</h5>
+              <p className={`text-xs sm:text-sm leading-relaxed font-sans transition-colors ${
+                activeTheme === 'evening' ? 'text-[#EBE4DC]/80' : 'text-cozy-dark/85'
+              }`}>
                 Thời tiết bên ngoài là khách, tâm trạng bên trong là chủ nhà. Bất kể ngoài trời mưa giăng trắng lối hay gió rét căm căm, chúc bạn luôn thắp sáng được ngọn lửa ấm áp, an lành bên hiên cửa sổ gỗ của riêng mình.
               </p>
             </div>

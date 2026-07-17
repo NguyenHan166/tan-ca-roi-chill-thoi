@@ -2,12 +2,14 @@ import React, { useState } from 'react';
 import { Mail, Sparkles, Send } from 'lucide-react';
 import { saveSubscription } from '../lib/localStorage';
 import { motion, AnimatePresence } from 'motion/react';
+import { TimeTheme } from '../types';
 
 interface NewsletterSectionProps {
   onToast: (msg: string, type: 'info' | 'success' | 'heart' | 'error') => void;
+  activeTheme?: TimeTheme;
 }
 
-export const NewsletterSection: React.FC<NewsletterSectionProps> = ({ onToast }) => {
+export const NewsletterSection: React.FC<NewsletterSectionProps> = ({ onToast, activeTheme = 'morning' }) => {
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
@@ -43,7 +45,11 @@ export const NewsletterSection: React.FC<NewsletterSectionProps> = ({ onToast })
   return (
     <section
       id="newsletter-section"
-      className="py-32 md:py-48 px-6 md:px-12 bg-cozy-cream/30 border-b border-cozy-wood/5 relative overflow-hidden bg-grain"
+      className={`py-32 md:py-48 px-6 md:px-12 border-b relative overflow-hidden bg-grain transition-all duration-[1200ms] ${
+        activeTheme === 'evening'
+          ? 'bg-[#181310] border-[#5A483B]/20 text-[#EBE4DC]'
+          : 'bg-cozy-cream/30 border-cozy-wood/5 text-cozy-dark'
+      }`}
     >
       {/* Decorative ambient blobs */}
       <div className="absolute top-1/2 left-1/4 w-96 h-96 rounded-full bg-cozy-warm-yellow/5 blur-[130px] -translate-y-1/2 pointer-events-none" />
@@ -52,19 +58,27 @@ export const NewsletterSection: React.FC<NewsletterSectionProps> = ({ onToast })
       <div className="max-w-3xl mx-auto text-center relative z-10 space-y-10">
         
         {/* Floating post symbol */}
-        <div className="flex items-center justify-center gap-2 text-cozy-wood/60 tracking-[0.25em] text-[10px] font-bold uppercase">
-          <span className="w-1.5 h-1.5 rounded-full bg-cozy-wood/30" />
+        <div className={`flex items-center justify-center gap-2 tracking-[0.25em] text-[10px] font-bold uppercase transition-colors ${
+          activeTheme === 'evening' ? 'text-cozy-warm-yellow' : 'text-cozy-wood/60'
+        }`}>
+          <span className={`w-1.5 h-1.5 rounded-full ${activeTheme === 'evening' ? 'bg-cozy-warm-yellow/30' : 'bg-cozy-wood/30'}`} />
           <span>Hòm thư gõ cửa</span>
-          <span className="w-1.5 h-1.5 rounded-full bg-cozy-wood/30" />
+          <span className={`w-1.5 h-1.5 rounded-full ${activeTheme === 'evening' ? 'bg-cozy-warm-yellow/30' : 'bg-cozy-wood/30'}`} />
         </div>
 
         {/* Poetic Title Block */}
         <div className="space-y-4">
-          <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-semibold text-cozy-dark leading-tight text-balance">
+          <h2 className={`font-serif text-3xl sm:text-4xl md:text-5xl font-semibold leading-tight text-balance transition-colors ${
+            activeTheme === 'evening' ? 'text-[#EBE4DC]' : 'text-cozy-dark'
+          }`}>
             Thỉnh thoảng, mình viết cho nhau <br />
-            <span className="font-serif italic font-light text-cozy-wood">vài dòng thư tay mộc mạc.</span>
+            <span className={`font-serif italic font-light transition-colors ${
+              activeTheme === 'evening' ? 'text-cozy-warm-yellow' : 'text-cozy-wood'
+            }`}>vài dòng thư tay mộc mạc.</span>
           </h2>
-          <p className="text-sm sm:text-base text-cozy-dark/80 max-w-lg mx-auto leading-relaxed">
+          <p className={`text-sm sm:text-base max-w-lg mx-auto leading-relaxed transition-colors ${
+            activeTheme === 'evening' ? 'text-[#EBE4DC]/80' : 'text-cozy-dark/80'
+          }`}>
             Không có thư rác hay những dòng thông báo khuyến mãi ồn ào. Chỉ có những lời kể chuyện mộc mạc bên ánh lửa, vài playlist lofi tuyển lựa cho đêm mưa, hay gợi ý những món đồ gỗ mộc khiến căn phòng của bạn ấm cúng hơn.
           </p>
         </div>
@@ -80,14 +94,20 @@ export const NewsletterSection: React.FC<NewsletterSectionProps> = ({ onToast })
                 onSubmit={handleSubmit}
                 className="flex flex-col sm:flex-row items-stretch gap-4 bg-transparent p-0"
               >
-                <div className="flex-1 flex items-center gap-3 border-b border-cozy-wood/30 pb-2 px-1 focus-within:border-cozy-wood transition-colors">
-                  <Mail size={16} className="text-cozy-dark/50" />
+                <div className={`flex-1 flex items-center gap-3 border-b pb-2 px-1 focus-within:border-cozy-wood transition-colors ${
+                  activeTheme === 'evening' 
+                    ? 'border-[#5A483B]/40 focus-within:border-cozy-warm-yellow' 
+                    : 'border-cozy-wood/30 focus-within:border-cozy-wood'
+                }`}>
+                  <Mail size={16} className={activeTheme === 'evening' ? 'text-[#EBE4DC]/40' : 'text-cozy-dark/50'} />
                   <input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Địa chỉ hòm thư của bạn..."
-                    className="w-full bg-transparent text-sm text-cozy-dark font-semibold focus:outline-none placeholder-cozy-dark/35 font-sans py-2"
+                    className={`w-full bg-transparent text-sm font-semibold focus:outline-none font-sans py-2 ${
+                      activeTheme === 'evening' ? 'text-[#EBE4DC] placeholder-[#EBE4DC]/30' : 'text-cozy-dark placeholder-cozy-dark/35'
+                    }`}
                     disabled={isLoading}
                     aria-label="Địa chỉ email đăng ký nhận thư tay"
                   />
@@ -96,11 +116,15 @@ export const NewsletterSection: React.FC<NewsletterSectionProps> = ({ onToast })
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="px-6 py-3.5 rounded-full bg-cozy-wood hover:bg-cozy-moss text-[#FFFDF8] text-xs font-bold uppercase tracking-wider transition-all duration-500 flex items-center justify-center gap-1.5 shadow-xl shadow-cozy-wood/10 active:scale-97 disabled:opacity-50 cursor-pointer shrink-0"
+                  className={`px-6 py-3.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all duration-500 flex items-center justify-center gap-1.5 shadow-xl active:scale-97 disabled:opacity-50 cursor-pointer shrink-0 ${
+                    activeTheme === 'evening'
+                      ? 'bg-cozy-warm-yellow hover:bg-[#F2D7A5] text-[#181310] shadow-cozy-warm-yellow/5'
+                      : 'bg-cozy-wood hover:bg-cozy-moss text-[#FFFDF8] shadow-cozy-wood/10'
+                  }`}
                 >
                   {isLoading ? (
                     <>
-                      <span className="w-3 h-3 rounded-full border-2 border-cozy-ivory border-t-transparent animate-spin" />
+                      <span className="w-3 h-3 rounded-full border-2 border-white border-t-transparent animate-spin" />
                       Đang đóng dấu sáp...
                     </>
                   ) : (
@@ -115,17 +139,27 @@ export const NewsletterSection: React.FC<NewsletterSectionProps> = ({ onToast })
                 key="subscription-success"
                 initial={{ opacity: 0, scale: 0.98 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="p-8 bg-[#FFFDF8] border border-cozy-wood/10 rounded-[24px] shadow-2xl shadow-cozy-dark/5"
+                className={`p-8 border rounded-[24px] shadow-2xl transition-colors ${
+                  activeTheme === 'evening'
+                    ? 'bg-[#1C1713] border-[#5A483B]/40 text-[#EBE4DC]'
+                    : 'bg-[#FFFDF8] border-cozy-wood/10 text-cozy-dark shadow-cozy-dark/5'
+                }`}
               >
-                <h3 className="font-serif text-lg font-bold text-cozy-wood italic mb-2">
+                <h3 className={`font-serif text-lg font-bold italic mb-2 ${
+                  activeTheme === 'evening' ? 'text-cozy-warm-yellow' : 'text-cozy-wood'
+                }`}>
                   Đã niêm phong hòm thư của bạn!
                 </h3>
-                <p className="text-sm text-cozy-dark/80 leading-relaxed font-sans">
+                <p className={`text-sm leading-relaxed font-sans ${
+                  activeTheme === 'evening' ? 'text-[#EBE4DC]/80' : 'text-cozy-dark/80'
+                }`}>
                   Một sợi dây tơ đã nối liền hòm thư của chúng ta. Tụi mình sẽ gửi đi lá thư tay đầu tiên cùng playlist xoa dịu đôi mắt mỏi mệt sớm thôi. Đôi khi thư có thể lơ đãng lạc vào thư mục quảng cáo (Promotions) hoặc Spam, hãy kiểm tra giúp tụi mình nhé.
                 </p>
                 <button
                   onClick={() => setIsSubscribed(false)}
-                  className="mt-5 text-xs font-bold uppercase tracking-wider text-cozy-moss hover:underline cursor-pointer"
+                  className={`mt-5 text-xs font-bold uppercase tracking-wider cursor-pointer transition-colors ${
+                    activeTheme === 'evening' ? 'text-cozy-warm-yellow hover:underline' : 'text-cozy-moss hover:underline'
+                  }`}
                 >
                   Gửi lá thư khác &rarr;
                 </button>
@@ -135,7 +169,9 @@ export const NewsletterSection: React.FC<NewsletterSectionProps> = ({ onToast })
         </div>
 
         {/* Minimalist note */}
-        <p className="text-xs text-cozy-dark/50 uppercase tracking-wider font-mono">
+        <p className={`text-xs uppercase tracking-wider font-mono transition-colors ${
+          activeTheme === 'evening' ? 'text-[#EBE4DC]/40' : 'text-cozy-dark/50'
+        }`}>
           * Hoàn toàn phi lợi nhuận • Huỷ đăng ký bất cứ lúc nào
         </p>
       </div>
