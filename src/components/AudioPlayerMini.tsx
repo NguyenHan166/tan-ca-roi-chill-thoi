@@ -210,15 +210,15 @@ export const AudioPlayerMini: React.FC<AudioPlayerMiniProps> = ({
 
     return (
         <div
-            className="fixed bottom-4 left-4 right-4 md:bottom-6 md:left-6 md:right-auto z-[99999] flex flex-col items-stretch md:items-start gap-2"
+            className="fixed inset-x-4 bottom-4 z-[99999] box-border flex max-w-[calc(100vw-2rem)] flex-col items-stretch gap-2 md:bottom-6 md:left-6 md:right-auto md:max-w-none md:items-start"
             id="cozy-ambient-audio-player"
         >
-            <div className="bg-cozy-ivory border-2 border-cozy-wood/20 backdrop-blur-md rounded-2xl shadow-2xl p-3 w-full md:w-88 transition-all duration-300">
-                <div className="flex items-center justify-between gap-3">
+            <div className="w-full min-w-0 max-w-full box-border overflow-hidden rounded-2xl border-2 border-cozy-wood/20 bg-cozy-ivory p-3 shadow-2xl backdrop-blur-md transition-all duration-300 md:w-88">
+                <div className="flex min-w-0 items-center justify-between gap-3">
                     {/* Track Info */}
                     <button
                         onClick={() => setIsExpanded(!isExpanded)}
-                        className="flex items-center gap-3 text-left flex-1 cursor-pointer group"
+                        className="group flex min-w-0 flex-1 items-center gap-3 text-left cursor-pointer"
                     >
                         <div className="w-10 h-10 rounded-full bg-cozy-wood/5 flex items-center justify-center text-cozy-wood shrink-0 relative overflow-hidden">
                             {isPlaying && (
@@ -246,7 +246,7 @@ export const AudioPlayerMini: React.FC<AudioPlayerMiniProps> = ({
                     </button>
 
                     {/* Controls */}
-                    <div className="flex items-center gap-2">
+                    <div className="flex shrink-0 items-center gap-2">
                         <button
                             onClick={handleMuteToggle}
                             className="w-8 h-8 rounded-full hover:bg-cozy-wood/5 flex items-center justify-center text-cozy-dark/70 hover:text-cozy-dark transition-colors cursor-pointer"
@@ -263,7 +263,7 @@ export const AudioPlayerMini: React.FC<AudioPlayerMiniProps> = ({
 
                         <button
                             onClick={handleTogglePlay}
-                            className="w-10 h-10 rounded-full bg-cozy-wood text-cozy-ivory flex items-center justify-center hover:bg-cozy-moss hover:scale-105 active:scale-95 transition-all duration-300 shadow-md cursor-pointer"
+                            className="h-10 w-10 shrink-0 rounded-full bg-cozy-wood text-cozy-ivory flex items-center justify-center hover:bg-cozy-moss hover:scale-105 active:scale-95 transition-all duration-300 shadow-md cursor-pointer"
                             aria-label={
                                 isPlaying ? "Tạm dừng" : "Bật âm thanh chill"
                             }
