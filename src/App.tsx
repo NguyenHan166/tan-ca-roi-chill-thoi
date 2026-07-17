@@ -13,6 +13,7 @@ import { NewsletterSection } from './sections/NewsletterSection';
 import { AudioPlayerMini, tracks } from './components/AudioPlayerMini';
 import { FavoriteDrawer } from './components/FavoriteDrawer';
 import { Toast } from './components/Toast';
+import { PomodoroSection } from './sections/PomodoroSection';
 
 import { Product, ToastMessage, TimeTheme } from './types';
 import { getFavorites, toggleFavorite } from './lib/localStorage';
@@ -167,6 +168,16 @@ export default function App() {
         <section className="py-24 px-4 md:px-8 border-b border-cozy-wood/5 max-w-7xl mx-auto w-full" id="cozy-desk">
           <MyDeskShowcase activeTheme={activeTheme} onToast={addToast} />
         </section>
+
+        {/* Pomodoro Focus Timer */}
+        <PomodoroSection
+          activeTheme={activeTheme}
+          isAudioPlaying={isAudioPlaying}
+          onPlayPauseToggle={setIsAudioPlaying}
+          activeTrackId={activeTrackId}
+          onChangeTrack={setActiveTrackId}
+          onToast={addToast}
+        />
 
         {/* Curated Products Affiliate Showcase Grid */}
         <ProductSection

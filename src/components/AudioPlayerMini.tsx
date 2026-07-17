@@ -19,6 +19,18 @@ export const tracks: AudioTrack[] = [
     iconName: 'Music',
   },
   {
+    id: 'focus-piano',
+    name: 'Dương cầm tập trung sâu',
+    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3', // Concentration track
+    iconName: 'Sparkles',
+  },
+  {
+    id: 'alpha-waves',
+    name: 'Tần số sóng não Alpha',
+    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3', // Concentration track
+    iconName: 'Sparkles',
+  },
+  {
     id: 'rain',
     name: 'Mưa rơi hiên nhà cũ',
     url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3', // Fallback URL
@@ -168,6 +180,8 @@ export const AudioPlayerMini: React.FC<AudioPlayerMiniProps> = ({
         return <Coffee size={size} />;
       case 'Trees':
         return <Trees size={size} />;
+      case 'Sparkles':
+        return <Sparkles size={size} />;
       default:
         return <Music size={size} />;
     }
